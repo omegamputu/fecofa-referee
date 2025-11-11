@@ -1,0 +1,73 @@
+services:
+  # Service PHP / Laravel
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: referee_app
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+    depends_on:
+      - db
+      - maildev
+    networks:
+      - laravel_network
+
+  # Service MySQL
+  db:
+    image: mysql:8.0
+    container_name: laravel__db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root      # Définit le mot de passe root
+      MYSQL_DATABASE: fecofa_referee        # Crée la base de données automatiquement
+      MYSQL_USER: Admin       # Crée un utilisateur standard
+      MYSQL_PASSWORD: Ref@dmin2025         # Mot de passe de l'utilisateur laravel_user
+    ports:
+      - "3306:3306"
+    networks:
+      - laravel_network
+  # Service MailDev
+  maildev:
+    image: maildev/maildev
+    container_name: mail_dev
+    restart: unless-stopped
+    ports:
+      - "1080:1080" # Interface web
+      - "1025:1025" # Serveur SMTP
+    networks:
+      - laravel_network
+  # Service phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: laravel__phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    networks:
+      - laravel_network
+
+  # Service Nginx
+  webserver:
+    image: nginx:alpine
+    container_name: laravel__webserver
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www
+      - ./docker/nginx:/etc/nginx/conf.d
+    depends_on:
+      - app
+    networks:
+      - laravel_network
+
+networks:
+  laravel_network:
+    driver: bridge
