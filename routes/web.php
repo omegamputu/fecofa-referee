@@ -30,3 +30,9 @@ Route::middleware(['auth'])->group(function () {
         )
         ->name('two-factor.show');
 });
+
+// Invitation-only : bloquer /register s’il reste un lien perdu
+Route::match(['get','post'], '/register', function () {
+    return redirect()->route('login')
+        ->withErrors(['email' => "L’inscription publique est désactivée. Demandez une invitation à l’administrateur (support@fecofa.cd)."]);
+})->name('register')->middleware('guest');
