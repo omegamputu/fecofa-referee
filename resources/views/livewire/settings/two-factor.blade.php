@@ -177,7 +177,7 @@ new class extends Component {
     }
 } ?>
 
-<section class="w-full">
+<section class="container mx-auto w-full max-w-7xl px-6">
     @include('partials.settings-heading')
 
     <x-settings.layout

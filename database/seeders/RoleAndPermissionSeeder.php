@@ -58,6 +58,8 @@ class RoleAndPermissionSeeder extends Seeder
             'generate_reports', 'export_internal_list', 'import_referee_data'
         ]);
 
+        $superAdmin->syncPermissions(Permission::all());
+
         // ---- Super-Admin par défaut (via variables d'env si dispos)
         $email = env('SUPER_ADMIN_EMAIL', 'administrator@fecofa.cd');
         $pass  = env('SUPER_ADMIN_PASSWORD', 'Ref@dmin#2025');
@@ -71,6 +73,7 @@ class RoleAndPermissionSeeder extends Seeder
         );
 
         $user->forceFill(['password_set_at' => now()])->save();
+
         $user->syncRoles(['Super_Admin']);
 
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();

@@ -31,7 +31,9 @@ class MustSetPassword
                 $user->logout();
 
                 return redirect()->route('login')
-                    ->withErrors(['email' => "Vous devez définir un mot de passe avant de continuer. Veuillez utiliser le lien de réinitialisation du mot de passe envoyé à votre adresse e-mail."]);
+                    ->withErrors([
+                        'email' => "Vous devez définir un mot de passe avant de continuer. Veuillez utiliser le lien de réinitialisation du mot de passe envoyé à votre adresse e-mail."
+                    ]);
             }
         }
 

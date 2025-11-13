@@ -12,6 +12,15 @@ Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+Route::middleware(['auth', 'permission:admin_access', 'must_set_password'])
+    ->prefix('admin')->name('admin')->as('admin.')
+    ->group(function () {
+        Volt::route('/dashboard', 'admin.dashboard')->name('dashboard');
+        //Volt::route('roles', 'admin.roles')->name('roles.index');
+        //Volt::route('permissions', 'admin.permissions')->name('permissions.index');
+        //Volt::route('users', 'admin.users')->name('users.index');
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 

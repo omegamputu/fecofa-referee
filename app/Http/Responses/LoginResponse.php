@@ -3,6 +3,7 @@
 namespace App\Http\Responses;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 
 class LoginResponse implements LoginResponseContract
@@ -22,6 +23,8 @@ class LoginResponse implements LoginResponseContract
         } else {
             $redirect = '/dashboard';
         }
+
+        Log::info('Redirect after login', ['user' => Auth::id()]);
 
         return $request->wantsJson()
                     ? response()->json(['redirect' => $redirect])
