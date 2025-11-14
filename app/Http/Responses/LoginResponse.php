@@ -18,7 +18,7 @@ class LoginResponse implements LoginResponseContract
     {
         $user = Auth::user();
 
-        if (method_exists($user, 'hasRole') && $user->hasRole(['Super_Admin', 'Admin'])) {
+        if (method_exists($user, 'hasRole') && $user->hasRole(['Owner', 'Administrator'])) {
             $redirect = '/admin/dashboard';
         } else {
             $redirect = '/dashboard';

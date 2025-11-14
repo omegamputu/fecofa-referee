@@ -40,9 +40,10 @@ class RoleAndPermissionSeeder extends Seeder
         }
 
         // Role
-        $superAdmin = Role::findOrCreate('Super_Admin', 'web');
-        $admin = Role::findOrCreate('Admin', 'web');
-        $deptArbitrage = Role::findOrCreate('Dept_Arbitrage', 'web');
+        $owner = Role::findOrCreate('Owner', 'web');
+        $admin = Role::findOrCreate('Administrator', 'web');
+        $member = Role::findOrCreate('Member', 'web');
+        $viewer = Role::findOrCreate('Viewer', 'web');
 
         $admin->syncPermissions([
             'manage_users','manage_roles','manage_permissions',
@@ -51,17 +52,22 @@ class RoleAndPermissionSeeder extends Seeder
             'import_referee_data', 'admin_access'
         ]);
 
-        $deptArbitrage->syncPermissions([
+        $member->syncPermissions([
             'create_referee','edit_referee','view_referee',
             'assign_match','edit_assignment','view_assignment',
             'record_evaluation','view_evaluation', 'manage_trainings',
             'generate_reports', 'export_internal_list', 'import_referee_data'
         ]);
 
-        $superAdmin->syncPermissions(Permission::all());
+        $viewer->syncPermissions([
+            'view_referee','view_assignment','view_evaluation',
+            'generate_reports', 'export_internal_list'
+        ]);
+
+        $owner->syncPermissions(Permission::all());
 
         // ---- Super-Admin par défaut (via variables d'env si dispos)
-        $email = env('SUPER_ADMIN_EMAIL', 'administrator@fecofa.cd');
+        $email = env('SUPER_ADMIN_EMAIL', 'superadmin@fecofa.cd');
         $pass  = env('SUPER_ADMIN_PASSWORD', 'Ref@dmin#2025');
 
         $user = User::firstOrCreate(
@@ -74,7 +80,7 @@ class RoleAndPermissionSeeder extends Seeder
 
         $user->forceFill(['password_set_at' => now()])->save();
 
-        $user->syncRoles(['Super_Admin']);
+        $user->syncRoles(['Owner']);
 
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
     }

@@ -18,7 +18,7 @@ Route::middleware(['auth', 'permission:admin_access', 'must_set_password'])
         Volt::route('/dashboard', 'admin.dashboard')->name('dashboard');
         //Volt::route('roles', 'admin.roles')->name('roles.index');
         //Volt::route('permissions', 'admin.permissions')->name('permissions.index');
-        //Volt::route('users', 'admin.users')->name('users.index');
+        Volt::route('/users', 'admin.users.index')->name('users.index');
 });
 
 Route::middleware(['auth'])->group(function () {

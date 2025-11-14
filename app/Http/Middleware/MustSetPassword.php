@@ -21,7 +21,7 @@ class MustSetPassword
             $user = Auth::user();
 
             // Exemption pour le SuperAdmin
-            if (method_exists($user, 'hasRole') && $user->hasRole('Super_Admin')) {
+            if (method_exists($user, 'hasRole') && $user->hasRole('Owner')) {
                 return $next($request);
             }
 

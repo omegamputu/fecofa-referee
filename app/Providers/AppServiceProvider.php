@@ -20,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Le Super-Admin passe avant tous les checks
+        Gate::before(function ($user, $ability) {
+            return $user->hasRole('Owner') ? true : null;
+        });
     }
 }
