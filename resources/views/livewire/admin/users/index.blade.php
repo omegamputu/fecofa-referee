@@ -4,6 +4,8 @@ use Livewire\Volt\Component;
 use App\Models\User;
 use Livewire\WithPagination;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Password;
 
 new class extends Component {
     //
@@ -78,11 +80,32 @@ new class extends Component {
             'password' => bcrypt(str()->random(12)),
         ]);
 
+        // Role assigned
+
         $user->assignRole($this->role);
+
+        /*
+        * INVITATION
+        * Alternatively, you can use the sendInvite method
+        */
+
+        $this->sendInvite($user);
+
+        $user->forceFill([
+            'invited_at' => now(),
+        ])->save();
+
+        $user->increment('invitation_sent_count');
 
         session()->flash('message', 'User created successfully.');
 
         $this->reset(['name', 'email', 'role']);
+    }
+
+    public function sendInvite(User $user): void
+    {
+        Cache::put("invite:{$user->email}", true, now()->addMinutes(2));
+        Password::broker('invites')->sendResetLink(['email' => $user->email]);
     }
 
     public function editUser(int $id)
@@ -175,17 +198,17 @@ new class extends Component {
                         <flux:text class="mt-2">Decribe personal details.</flux:text>
                     </div>
 
-                    <flux:input label="Name" wire:model.defer="name" type="text" placeholder="Your name"/>
-                    <flux:input label="Email" wire:model.defer="email" type="email" placeholder="Your email"/>
+                    <flux:input label="Name" wire:model.defer="name" type="text" placeholder="Your name" required />
+                    <flux:input label="Email" wire:model.defer="email" type="email" placeholder="Your email" required />
 
-                    <flux:select wire:model="role" placeholder="Select role">
+                    <flux:select wire:model="role" placeholder="Select role" required>
                         @foreach ($roles as $role)
                         <flux:select.option class="text-zinc-400" value="{{ $role }}">{{ ucfirst($role) }}</flux:select.option>
                         @endforeach
                     </flux:select>
 
                     <flux:button wire:click="createUser" type="button" variant="primary" color="green" class="w-full cursor-pointer">
-                        {{ __("Save") }}
+                        {{ __("Invite user") }}
                     </flux:button>
                 </div>
             </flux:modal>

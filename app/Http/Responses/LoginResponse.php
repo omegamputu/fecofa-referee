@@ -18,6 +18,13 @@ class LoginResponse implements LoginResponseContract
     {
         $user = Auth::user();
 
+        if (! $user->is_active) {
+            Auth::logout();
+
+            return redirect()->route('login')
+                ->withErrors(['email' => "Votre compte est désactivé. Contactez l’administrateur (support@fecofa.cd)."]);
+        }
+
         if (method_exists($user, 'hasRole') && $user->hasRole(['Owner', 'Administrator'])) {
             $redirect = '/admin/dashboard';
         } else {
