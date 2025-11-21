@@ -39,6 +39,9 @@ new class extends Component {
     {
         return [
             'users' => User::query()
+                ->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', 'Owner');
+                })
                 ->where('name', 'like', '%'.$this->search.'%')
                 ->orderBy('created_at', 'desc')
                 ->paginate(10)
@@ -139,10 +142,30 @@ new class extends Component {
 
         $user->syncRoles([$this->selectedRoles]);
 
-        Flux::modal("edit-user-{{ $user->id }}")->close();
-
         session()->flash('message', 'User updated successfully.');
     }
+
+    public function resendInvitation(int $id)
+    {
+        $this->authorize('manage_users');
+
+        $user = User::findOrFail($id);
+
+        if ($user->hasRole('Owner')) {
+            abort(403, "You can not resend invitation to Owner");
+        }
+
+        // Renvoi via broker d’invitation
+        Password::broker('invites')->sendResetLink(['email' => $user->email]);
+
+        // Trace
+        $user->invited_at = now();
+        $user->increment('invitation_sent_count');
+        $user->save();
+
+        session()->flash('status','Invitation renvoyée à '. $user->email);
+    }
+
 
     public function delete(int $id)
     {
@@ -156,8 +179,6 @@ new class extends Component {
         }
 
         $user->delete();
-
-        Flux::modal("delete-user-{{ $user->id }}")->close();
 
         session()->flash('message', 'User deleted successfully.');
     }
@@ -191,7 +212,7 @@ new class extends Component {
                 </flux:button>
             </flux:modal.trigger>
 
-            <flux:modal name="create-user" class="md:w-96">
+            <flux:modal name="create-user" class="md:w-96" variant="flyout">
                 <div class="space-y-6">
                     <div>
                         <flux:heading size="lg">Create user</flux:heading>
@@ -201,7 +222,7 @@ new class extends Component {
                     <flux:input label="Name" wire:model.defer="name" type="text" placeholder="Your name" required />
                     <flux:input label="Email" wire:model.defer="email" type="email" placeholder="Your email" required />
 
-                    <flux:select wire:model="role" placeholder="Select role" required>
+                    <flux:select wire:model="role" label="Role" placeholder="Select role" required>
                         @foreach ($roles as $role)
                         <flux:select.option class="text-zinc-400" value="{{ $role }}">{{ ucfirst($role) }}</flux:select.option>
                         @endforeach
@@ -270,7 +291,7 @@ new class extends Component {
                         </flux:button>
                     </flux:modal.trigger>
 
-                    <flux:modal name="edit-user-{{ $u->id }}" class="md:w-96" wire:key="edit-user-modal-{{ $u->id }}">
+                    <flux:modal name="edit-user-{{ $u->id }}" class="md:w-96" wire:key="edit-user-modal-{{ $u->id }}" variant="flyout">
                         <div class="space-y-6">
                             <div>
                                 <flux:heading size="lg">Edit user</flux:heading>
@@ -279,51 +300,98 @@ new class extends Component {
 
                             <flux:input label="Name" wire:model.defer="editName" type="text" placeholder="Your name"/>
                             <flux:input label="Email" wire:model.defer="editEmail" type="email" placeholder="Your email"/>
-
-                            <flux:select wire:model="selectedRoles" placeholder="Select role">
+                            
+                            <flux:select wire:model="selectedRoles" label="Role" placeholder="Select role">
                                 @foreach ($roles as $role)
                                 <flux:select.option class="text-zinc-400" value="{{ $role }}">{{ ucfirst($role) }}</flux:select.option>
                                 @endforeach
                             </flux:select>
-
+        
                             <flux:button wire:click="updateUser" type="button" variant="primary" color="green" class="w-full cursor-pointer">
                                 {{ __("Update") }}
                             </flux:button>
+
+                            @if (! $u->hasRole('Owner'))
+                                <flux:separator text="or" />
+
+                                <div class="text-sm text-zinc-500 dark:text-zinc-300">
+                                    <span class="font-semibold mb-3"> {{ __("Invitation Sent") }} </span> : {{ $u->invitation_sent_count ?? 0 }} </br>
+                                    
+                                    @if($u->invited_at)
+                                        <span class="font-semibold">{{ __("Last Sent") }}</span> : {{ optional($u->invited_at)->format('d/m/Y H:i') }}
+                                    @endif
+                                </div>
+                            @endif
                         </div>
                     </flux:modal>
 
-                    
+                    <flux:modal.trigger name="resent-invitation-user-{{ $u->id }}">
+                        <flux:button variant="primary" color="emerald" :loading="false" class="xs ms-1 cursor-pointer">
+                            {{ __("Resend Invitation") }}
+                        </flux:button>
+                    </flux:modal.trigger>
 
-                    @if (! $u->hasRole('Owner'))
-                        <flux:modal.trigger name="toggle-active-user-{{ $u->id }}">
-                            <flux:button variant="{{ $u->is_active ? 'primary' : 'primary' }}" color="{{ $u->is_active ? 'orange' : 'emerald' }}" :loading="false" class="xs cursor-pointer ms-1">
-                                @if ($u->is_active)
-                                    {{ __("Deactivate") }}
-                                @else
-                                    {{ __("Activate") }}
-                                @endif
-                            </flux:button>
-                        </flux:modal.trigger>
+                    <flux:modal name="resent-invitation-user-{{ $u->id }}" class="md:w-96">
+                        <div class="space-y-6">
+                            <div>
+                                <flux:heading size="lg">Resend Invitation</flux:heading>
+                                <flux:text class="mt-2">Are you sure you want to resend the invitation to this user?</flux:text>
+                            </div>
 
-                        <flux:modal name="toggle-active-user-{{ $u->id }}" class="md:w-96">
-                            <div class="space-y-6">
-                                <div>
-                                    <flux:heading size="lg">{{ $u->is_active ? 'Deactivate' : 'Activate' }} user</flux:heading>
-                                    <flux:text class="mt-2">Are you sure you want to {{ $u->is_active ? 'deactivate' : 'activate' }} this user?</flux:text>
-                                </div>
+                            <div class="flex gap-2">
+                                <flux:spacer />
 
-                                <flux:button wire:click="toggleActive({{ $u->id }})" type="button" variant="{{ $u->is_active ? 'danger' : 'primary' }}" color="{{ $u->is_active ? 'red' : 'green' }}" class="cursor-pointer">
+                                <flux:modal.close>
+                                    <flux:button variant="ghost" type="button" class="cursor-pointer">
+                                        {{ __("Cancel") }}
+                                    </flux:button>
+                                </flux:modal.close>
+
+                                <flux:button wire:click="resendInvitation({{ $u->id }})" type="button" variant="primary" color="green" class="cursor-pointer">
                                     {{ __("Confirm") }}
                                 </flux:button>
                             </div>
-                        </flux:modal>
+                        </div>
+                    </flux:modal>
 
-                        <flux:modal.trigger name="delete-user-{{ $u->id }}">
-                            <flux:button variant="danger" :loading="false" class="xs text-red-600 cursor-pointer ms-1">
-                                {{ __("Delete") }}
-                            </flux:button>
-                        </flux:modal.trigger>
-                    @endif
+                    <flux:modal.trigger name="toggle-active-user-{{ $u->id }}">
+                        <flux:button variant="{{ $u->is_active ? 'primary' : 'primary' }}" color="{{ $u->is_active ? 'orange' : 'emerald' }}" :loading="false" class="xs cursor-pointer ms-1">
+                            @if ($u->is_active)
+                                {{ __("Deactivate") }}
+                            @else
+                                {{ __("Activate") }}
+                            @endif
+                        </flux:button>
+                    </flux:modal.trigger>
+
+                    <flux:modal name="toggle-active-user-{{ $u->id }}" class="md:w-96">
+                        <div class="space-y-6">
+                            <div>
+                                <flux:heading size="lg">{{ $u->is_active ? 'Deactivate' : 'Activate' }} user</flux:heading>
+                                <flux:text class="mt-2">Are you sure you want to {{ $u->is_active ? 'deactivate' : 'activate' }} this user?</flux:text>
+                            </div>
+
+                            <div class="flex gap-2">
+                                <flux:spacer />
+
+                                <flux:modal.close>
+                                    <flux:button variant="ghost" type="button" class="cursor-pointer">
+                                        {{ __("Cancel") }}
+                                    </flux:button>
+                                </flux:modal.close>
+
+                                <flux:button wire:click="toggleActive({{ $u->id }})" type="button" variant="primary" color="green" class="cursor-pointer">
+                                    {{ __("Confirm") }}
+                                </flux:button>
+                            </div>
+                        </div>
+                    </flux:modal>
+
+                    <flux:modal.trigger name="delete-user-{{ $u->id }}">
+                        <flux:button variant="danger" :loading="false" class="xs text-red-600 cursor-pointer ms-1">
+                            {{ __("Delete") }}
+                        </flux:button>
+                    </flux:modal.trigger>
 
                     <flux:modal name="delete-user-{{ $u->id }}" class="md:w-96">
                         <div class="space-y-6">
@@ -332,9 +400,19 @@ new class extends Component {
                                 <flux:text class="mt-2">Are you sure you want to delete this user? This action cannot be undone.</flux:text>
                             </div>
 
-                            <flux:button wire:click="delete({{ $u->id }})" type="button" variant="danger" color="red" class="cursor-pointer">
-                                {{ __("Confirm") }}
-                            </flux:button>
+                            <div class="flex gap-2">
+                                <flux:spacer />
+
+                                <flux:modal.close>
+                                    <flux:button variant="ghost" type="button" class="cursor-pointer">
+                                        {{ __("Cancel") }}
+                                    </flux:button>
+                                </flux:modal.close>
+
+                                <flux:button wire:click="delete({{ $u->id }})" type="button" variant="danger" color="green" class="cursor-pointer">
+                                    {{ __("Confirm") }}
+                                </flux:button>
+                            </div>
                         </div>
                     </flux:modal>
                 </td>
