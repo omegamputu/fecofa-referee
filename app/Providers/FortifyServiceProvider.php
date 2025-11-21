@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
+use Livewire\Volt\Volt;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,10 @@ class FortifyServiceProvider extends ServiceProvider
     public function register(): void
     {
         //
+        $this->app->singleton(
+            \Laravel\Fortify\Contracts\LoginResponse::class,
+            \App\Http\Responses\LoginResponse::class,
+        );
     }
 
     /**
@@ -50,7 +55,13 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::twoFactorChallengeView(fn () => view('livewire.auth.two-factor-challenge'));
         Fortify::confirmPasswordView(fn () => view('livewire.auth.confirm-password'));
         Fortify::registerView(fn () => view('livewire.auth.register'));
-        Fortify::resetPasswordView(fn () => view('livewire.auth.reset-password'));
+        // ➜ REMPLACER la vue Blade par TON composant Volt :
+        Fortify::resetPasswordView(function (Request $request) {
+            return Volt::render('auth/invite-set-password', [
+                'token' => $request->route('token'),
+                'email' => $request->email,
+            ]);
+        });
         Fortify::requestPasswordResetLinkView(fn () => view('livewire.auth.forgot-password'));
     }
 

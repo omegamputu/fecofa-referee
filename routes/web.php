@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Auth\InviteSetPassword;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
@@ -8,9 +9,20 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+Volt::route('/invite/accept/{token}', InviteSetPassword::class)->name('invite.accept');
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+Route::middleware(['auth', 'permission:admin_access', 'must_set_password'])
+    ->prefix('admin')->name('admin')->as('admin.')
+    ->group(function () {
+        Volt::route('/dashboard', 'admin.dashboard')->name('dashboard');
+        //Volt::route('roles', 'admin.roles')->name('roles.index');
+        //Volt::route('permissions', 'admin.permissions')->name('permissions.index');
+        Volt::route('/users', 'admin.users.index')->name('users.index');
+});
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');

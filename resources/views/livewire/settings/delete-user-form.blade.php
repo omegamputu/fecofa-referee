@@ -22,7 +22,7 @@ new class extends Component {
     }
 }; ?>
 
-<section class="mt-10 space-y-6">
+<section class="container mx-auto w-full max-w-7xl px-6 mt-10 space-y-6">
     <div class="relative mb-5">
         <flux:heading>{{ __('Delete account') }}</flux:heading>
         <flux:subheading>{{ __('Delete your account and all of its resources') }}</flux:subheading>
