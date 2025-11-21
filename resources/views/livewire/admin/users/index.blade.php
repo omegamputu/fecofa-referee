@@ -4,183 +4,168 @@ use Livewire\Volt\Component;
 use App\Models\User;
 use Livewire\WithPagination;
 use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Password;
+use App\Queries\UserIndexQuery;
+use App\Actions\Users\CreateUser;
+use App\Actions\Users\UpdateUser;
+use App\Actions\Users\ToggleActive;
+use App\Actions\Users\ResendInvite;
+use App\Actions\Users\DeleteUser;
 
 new class extends Component {
     //
     use WithPagination;
 
+    /* ─────────────
+     |  State
+     * ────────────*/
     public string $search = '';
+    public int $perPage = 10;
+
+    // Create
     public string $name = '';
-    public string $email = '';  
+    public string $email = '';
     public string $role = '';
     public array $roles = [];
 
     // Edit
-    public $editUserId;
-    public $editName;
-    public $editEmail;
-    public $selectedRoles = [];
+    public ?int $editUserId = null;
+    public string $editName = '';
+    public string $editEmail = '';
+    public string $selectedRole = '';
 
+    protected $listeners = ['users:refresh' => '$refresh'];
+
+    /* ─────────────
+     |  Lifecycle
+     * ────────────
+    */
     public function mount(): void
     {
-        //
-        $this->roles = Role::whereNotIn('name', ['Owner'])->pluck('name')->toArray();
+        // Cache les rôles non Owner pour éviter la requête à chaque chargement
+        $this->roles = cache()->remember(
+            'roles:list:non_owner',
+            now()->addMinutes(10),
+            fn () => Role::whereNotIn('name', ['Owner'])->pluck('name')->toArray()
+        );
     }
     
 
-    public function updatingSearch()
+    public function updatingSearch(): void
     {
         $this->resetPage();
     }
 
-    public function with()
+    public function with(): array
     {
         return [
-            'users' => User::query()
-                ->whereDoesntHave('roles', function ($q) {
-                    $q->where('name', 'Owner');
-                })
-                ->where('name', 'like', '%'.$this->search.'%')
-                ->orderBy('created_at', 'desc')
-                ->paginate(10)
+            'users' => app(UserIndexQuery::class)->run($this->search, $this->perPage),
         ];
     }
 
-    public function toggleActive(int $id)
+    /* ─────────────
+     |  Validation
+     * ────────────*/
+    protected function createRules(): array
     {
-        abort_unless(auth()->user()->can('manage_users'), 403);
-
-        $user = User::findOrFail($id);
-
-        if ($user->hasRole('Owner')) {
-            # code...
-            abort(403, "You can not change status of Owner");
-        }
-
-        $user->is_active = ! $user->is_active;
-
-        $user->save();
-
-        session()->flash('message', 'User status updated successfully.');
+        return [
+            'name'  => ['required', 'string', 'max:255'],
+            'email' => [
+                'required','email','max:255',
+                'unique:users,email',
+                'regex:/@fecofa\.cd$/i',
+            ],
+            'role'  => ['required','string','in:'.implode(',', $this->roles)],
+        ];
     }
 
-    public function createUser()
+    protected function updateRules(): array
     {
-        abort_unless(auth()->user()->can('manage_users'), 403);
+        return [
+            'editName'  => ['required','string','max:255'],
+            'editEmail' => [
+                'required','email','max:255',
+                'unique:users,email,'.$this->editUserId,
+                'regex:/@fecofa\.cd$/i',
+            ],
+            'selectedRole' => ['required','string','in:'.implode(',', $this->roles)],
+        ];
+    }
 
-        $this->validate([
-            'name' => 'required|string|max:255',
-            'email' => ['required','email','max:255','unique:users,email','regex:/@fecofa\.cd$/i'],
-            'role' => 'required|string|in:'.implode(',', $this->roles),
-        ]);
+    /* ─────────────
+     |  Actions CRUD
+     * ────────────*/
 
-        // Create user
-        $user = User::create([
-            'name' => $this->name,
-            'email' => $this->email,
-            'password' => bcrypt(str()->random(12)),
-        ]);
+    public function createUser(CreateUser $createUser): void
+    {
+        $this->authorize('manage', User::class);
 
-        // Role assigned
+        $validated = $this->validate($this->createRules());
 
-        $user->assignRole($this->role);
-
-        /*
-        * INVITATION
-        * Alternatively, you can use the sendInvite method
-        */
-
-        $this->sendInvite($user);
-
-        $user->forceFill([
-            'invited_at' => now(),
-        ])->save();
-
-        $user->increment('invitation_sent_count');
-
-        session()->flash('message', 'User created successfully.');
+        $createUser($validated, $this->role);
 
         $this->reset(['name', 'email', 'role']);
+        session()->flash('message', __('User created and invitation sent.'));
+        $this->resetPage();
     }
 
-    public function sendInvite(User $user): void
+    public function editUser(int $id): void
     {
-        Cache::put("invite:{$user->email}", true, now()->addMinutes(2));
-        Password::broker('invites')->sendResetLink(['email' => $user->email]);
-    }
-
-    public function editUser(int $id)
-    {
-        abort_unless(auth()->user()->can('manage_users'), 403);
+        $this->authorize('manage', User::class);
 
         $user = User::findOrFail($id);
 
-        $this->editUserId = $user->id;
-        $this->editName = $user->name;
-        $this->editEmail = $user->email;
-        $this->selectedRoles = $user->roles->pluck('name')->first();
+        $this->editUserId   = $user->id;
+        $this->editName     = $user->name;
+        $this->editEmail    = $user->email;
+        $this->selectedRole = $user->roles->pluck('name')->first() ?? '';
     }
 
-    public function updateUser()
+    public function updateUser(UpdateUser $updateUser): void
     {
-        abort_unless(auth()->user()->can('manage_users'), 403);
+        $this->authorize('manage', User::class);
+        $this->validate($this->updateRules());
 
-        $this->validate([
-            'editName' => 'required|string|max:255',
-            'editEmail' => ['required','email','max:255','unique:users,email,'.$this->editUserId,'regex:/@fecofa\.cd$/i'],
-        ]);
+        $user = User::findOrFail($this->editUserId);
 
-        // Update user
-        $user = User::find($this->editUserId);
+        $updateUser($user, [
+            'name'  => $this->editName,
+            'email' => $this->editEmail,
+        ], $this->selectedRole);
 
-        $user->name = $this->editName;
-        $user->email = $this->editEmail;
-
-        $user->save();
-
-        $user->syncRoles([$this->selectedRoles]);
-
-        session()->flash('message', 'User updated successfully.');
+        session()->flash('status', __('User updated successfully.'));
     }
 
-    public function resendInvitation(int $id)
+    public function toggleActive(int $id): void
     {
-        $this->authorize('manage_users');
-
         $user = User::findOrFail($id);
+        // Vérifie la policy
+        $this->authorize('toggle', $user);
 
-        if ($user->hasRole('Owner')) {
-            abort(403, "You can not resend invitation to Owner");
-        }
+        // Appelle l'action manuellement via le conteneur
+        app(\App\Actions\Users\ToggleActive::class)($user);
 
-        // Renvoi via broker d’invitation
-        Password::broker('invites')->sendResetLink(['email' => $user->email]);
-
-        // Trace
-        $user->invited_at = now();
-        $user->increment('invitation_sent_count');
-        $user->save();
-
-        session()->flash('status','Invitation renvoyée à '. $user->email);
+        session()->flash('status', __('User status updated.'));
     }
 
-
-    public function delete(int $id)
+    public function resendInvitation(int $id, ResendInvite $resendInvite): void
     {
-        abort_unless(auth()->user()->can('manage_users'), 403);
-
         $user = User::findOrFail($id);
+        $this->authorize('invite', $user);
 
-        if ($user->hasRole('Owner')) {
-            # code...
-            abort(403, "You can delete Owner");
-        }
+        $resendInvite($user);
 
-        $user->delete();
+        session()->flash('status', __('Invitation sent again to :email', ['email' => $user->email]));
+    }
 
-        session()->flash('message', 'User deleted successfully.');
+    public function delete(int $id, DeleteUser $deleteUser): void
+    {
+        $user = User::findOrFail($id);
+        $this->authorize('delete', $user);
+
+        $deleteUser($user);
+
+        session()->flash('status', __('User deleted successfully.'));
+        $this->resetPage();
     }
 }; 
 
@@ -301,32 +286,40 @@ new class extends Component {
                             <flux:input label="Name" wire:model.defer="editName" type="text" placeholder="Your name"/>
                             <flux:input label="Email" wire:model.defer="editEmail" type="email" placeholder="Your email"/>
                             
-                            <flux:select wire:model="selectedRoles" label="Role" placeholder="Select role">
+                            <flux:select wire:model="selectedRole" label="Role" placeholder="Select role">
                                 @foreach ($roles as $role)
                                 <flux:select.option class="text-zinc-400" value="{{ $role }}">{{ ucfirst($role) }}</flux:select.option>
                                 @endforeach
                             </flux:select>
-        
-                            <flux:button wire:click="updateUser" type="button" variant="primary" color="green" class="w-full cursor-pointer">
-                                {{ __("Update") }}
-                            </flux:button>
 
-                            @if (! $u->hasRole('Owner'))
-                                <flux:separator text="or" />
+                            <div class="flex gap-2">
+                                <flux:modal.close>
+                                    <flux:button variant="ghost" type="button" class="cursor-pointer">
+                                        {{ __("Cancel") }}
+                                    </flux:button>
+                                </flux:modal.close>
 
-                                <div class="text-sm text-zinc-500 dark:text-zinc-300">
-                                    <span class="font-semibold mb-3"> {{ __("Invitation Sent") }} </span> : {{ $u->invitation_sent_count ?? 0 }} </br>
-                                    
-                                    @if($u->invited_at)
-                                        <span class="font-semibold">{{ __("Last Sent") }}</span> : {{ optional($u->invited_at)->format('d/m/Y H:i') }}
-                                    @endif
-                                </div>
-                            @endif
+                                <flux:modal.close>
+                                    <flux:button wire:click="updateUser" type="button" variant="primary" color="green" class="cursor-pointer">
+                                        {{ __("Update") }}
+                                    </flux:button>
+                                </flux:modal.close>
+                            </div>
+
+                            <flux:separator text="or" />
+
+                            <div class="text-sm text-zinc-500 dark:text-zinc-300">
+                                <span class="font-semibold mb-3"> {{ __("Invitation Sent") }} </span> : {{ $u->invitation_sent_count ?? 0 }} </br>
+                                
+                                @if($u->invited_at)
+                                    <span class="font-semibold">{{ __("Last Sent") }}</span> : {{ optional($u->invited_at)->format('d/m/Y H:i') }}
+                                @endif
+                            </div>
                         </div>
                     </flux:modal>
 
                     <flux:modal.trigger name="resent-invitation-user-{{ $u->id }}">
-                        <flux:button variant="primary" color="emerald" :loading="false" class="xs ms-1 cursor-pointer">
+                        <flux:button variant="primary" color="blue" :loading="false" class="xs ms-1 cursor-pointer">
                             {{ __("Resend Invitation") }}
                         </flux:button>
                     </flux:modal.trigger>
@@ -347,9 +340,11 @@ new class extends Component {
                                     </flux:button>
                                 </flux:modal.close>
 
-                                <flux:button wire:click="resendInvitation({{ $u->id }})" type="button" variant="primary" color="green" class="cursor-pointer">
-                                    {{ __("Confirm") }}
-                                </flux:button>
+                                <flux:modal.close>
+                                    <flux:button wire:click="resendInvitation({{ $u->id }})" type="button" variant="primary" color="green" class="cursor-pointer">
+                                        {{ __("Confirm") }}
+                                    </flux:button>
+                                </flux:modal.close>
                             </div>
                         </div>
                     </flux:modal>
@@ -380,9 +375,11 @@ new class extends Component {
                                     </flux:button>
                                 </flux:modal.close>
 
-                                <flux:button wire:click="toggleActive({{ $u->id }})" type="button" variant="primary" color="green" class="cursor-pointer">
-                                    {{ __("Confirm") }}
-                                </flux:button>
+                                <flux:modal.close>
+                                    <flux:button wire:click="toggleActive({{ $u->id }})" type="button" variant="primary" color="green" class="cursor-pointer">
+                                        {{ __("Confirm") }}
+                                    </flux:button>
+                                </flux:modal.close>
                             </div>
                         </div>
                     </flux:modal>
@@ -409,9 +406,11 @@ new class extends Component {
                                     </flux:button>
                                 </flux:modal.close>
 
-                                <flux:button wire:click="delete({{ $u->id }})" type="button" variant="danger" color="green" class="cursor-pointer">
-                                    {{ __("Confirm") }}
-                                </flux:button>
+                                <flux:modal.close>
+                                    <flux:button wire:click="delete({{ $u->id }})" type="button" variant="danger" color="green" class="cursor-pointer">
+                                        {{ __("Confirm") }}
+                                    </flux:button>
+                                </flux:modal.close>
                             </div>
                         </div>
                     </flux:modal>
