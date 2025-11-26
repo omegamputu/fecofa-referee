@@ -27,6 +27,7 @@ class RoleAndPermissionSeeder extends Seeder
             'delete_referee', 'assign_referee', 'edit_assignment',
             'view_assignment', 'delete_assignment','record_evaluation',
             'view_evaluation','manage_trainings', 'admin_access', 'manage_admins',
+            'manage_leagues', 'manage_matches', 'manage_seasons',
 
             // Dept Arbitrage
             'create_referee','edit_referee','view_referee',

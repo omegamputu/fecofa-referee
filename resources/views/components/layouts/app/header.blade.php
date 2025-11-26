@@ -20,6 +20,9 @@
                 <flux:navbar.item icon="users" :href="route('admin.users.index')" :current="request()->routeIs('admin.users.index')" wire:navigate>
                     {{ __('Manage users') }}
                 </flux:navbar.item>
+                <flux:navbar.item icon="building-office" :href="route('admin.leagues.index')" :current="request()->routeIs('admin.leagues.index')" wire:navigate>
+                    {{ __('Manage leagues') }}
+                </flux:navbar.item>
             </flux:navbar>
 
             <flux:spacer />

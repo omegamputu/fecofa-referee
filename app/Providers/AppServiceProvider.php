@@ -27,5 +27,6 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::policy(User::class, \App\Policies\UserPolicy::class);
+        Gate::policy(\App\Models\League::class, \App\Policies\LeaguePolicy::class);
     }
 }
