@@ -186,7 +186,7 @@ new class extends Component {
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                     </svg>
                 </div>
-                <input type="text" id="default-search" wire:model.live="search" class="block w-full p-3 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="{{ __("Search by name") }}" required />
+                <input type="text" id="default-search" wire:model.debounce.300ms="search" class="block w-full p-3 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="{{ __("Search by name") }}" required />
             </div>
         </div>
 
@@ -222,7 +222,7 @@ new class extends Component {
     </div>
 
     <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-neutral-200 dark:border-neutral-700 rounded-xl">
-        <thead class="text-xs text-gray-700 uppercase dark:text-gray-400">
+        <thead class="text-xs text-gray-700 dark:text-gray-400 uppercase">
             <tr>
                 <th scope="col" class="px-6 py-3">
                     {{ __("Name") }}
@@ -244,7 +244,7 @@ new class extends Component {
         <tbody>
             @foreach($users as $u)
             <tr class="border-b border-neutral-200 dark:border-neutral-700">
-                <th scope="row" class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"">
+                <th scope="row" class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
                     <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
                         <span
                             class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
@@ -271,7 +271,7 @@ new class extends Component {
                 </td>
                 <td class="px-6 py-4">
                     <flux:modal.trigger name="edit-user-{{ $u->id }}">
-                        <flux:button wire:click="editUser({{ $u->id }})" :loading="false" class="xs cursor-pointer">
+                        <flux:button wire:click="editUser({{ $u->id }})" :loading="false" size="sm" class="cursor-pointer">
                             {{ __("Edit") }}
                         </flux:button>
                     </flux:modal.trigger>
@@ -319,7 +319,7 @@ new class extends Component {
                     </flux:modal>
 
                     <flux:modal.trigger name="resent-invitation-user-{{ $u->id }}">
-                        <flux:button variant="primary" color="blue" :loading="false" class="xs ms-1 cursor-pointer">
+                        <flux:button variant="primary" color="blue" :loading="false" size="sm" class="ms-1 cursor-pointer">
                             {{ __("Resend Invitation") }}
                         </flux:button>
                     </flux:modal.trigger>
@@ -350,7 +350,7 @@ new class extends Component {
                     </flux:modal>
 
                     <flux:modal.trigger name="toggle-active-user-{{ $u->id }}">
-                        <flux:button variant="{{ $u->is_active ? 'primary' : 'primary' }}" color="{{ $u->is_active ? 'orange' : 'emerald' }}" :loading="false" class="xs cursor-pointer ms-1">
+                        <flux:button variant="{{ $u->is_active ? 'primary' : 'primary' }}" color="{{ $u->is_active ? 'orange' : 'emerald' }}" :loading="false" size="sm" class="cursor-pointer ms-1">
                             @if ($u->is_active)
                                 {{ __("Deactivate") }}
                             @else
@@ -385,7 +385,7 @@ new class extends Component {
                     </flux:modal>
 
                     <flux:modal.trigger name="delete-user-{{ $u->id }}">
-                        <flux:button variant="danger" :loading="false" class="xs text-red-600 cursor-pointer ms-1">
+                        <flux:button variant="danger" :loading="false" size="sm" class="text-red-600 cursor-pointer ms-1">
                             {{ __("Delete") }}
                         </flux:button>
                     </flux:modal.trigger>

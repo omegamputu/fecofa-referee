@@ -22,8 +22,9 @@ Route::middleware(['auth', 'permission:admin_access', 'must_set_password'])
         //Volt::route('roles', 'admin.roles')->name('roles.index');
         //Volt::route('permissions', 'admin.permissions')->name('permissions.index');
         Volt::route('/users', 'admin.users.index')->name('users.index');
+        Volt::route('/leagues', 'admin.leagues.index')->name('leagues.index');
 });
-
+ 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
