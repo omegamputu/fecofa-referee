@@ -146,7 +146,7 @@ new class extends Component {
         $this->authorize('toggle', $user);
 
         // Appelle l'action manuellement via le conteneur
-        app(\App\Actions\Users\ToggleActive::class)($user);
+        app(ToggleActive::class)($user);
 
         session()->flash('status', __('User status updated.'));
     }
