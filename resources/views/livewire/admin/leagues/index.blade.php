@@ -8,8 +8,7 @@ use App\Actions\Leagues\EditLeague;
 use App\Actions\Leagues\UpdateLeague;
 use App\Actions\Leagues\DeleteLeague;
 
-new class extends Component
-{
+new class extends Component {
     use WithPagination;
 
     public string $search = '';
@@ -45,7 +44,7 @@ new class extends Component
             'leagues' => League::query()
                 ->when($this->search, function ($q) {
                     $q->where('name', 'like', "%{$this->search}%")
-                      ->orWhere('province', 'like', "%{$this->search}%");
+                        ->orWhere('province', 'like', "%{$this->search}%");
                 })
                 ->orderBy('name')
                 ->paginate($this->perPage),
@@ -57,24 +56,24 @@ new class extends Component
     protected function createRules(): array
     {
         return [
-            'name'           => ['required','string','max:255','unique:leagues,name'],
-            'code'           => ['nullable','string','max:50','unique:leagues,code'],
-            'province'       => ['nullable','string','max:255'],
-            'headquarters'   => ['nullable','string','max:255'],
-            'contact_email'  => ['nullable','email','max:255'],
-            'contact_phone'  => ['nullable','string','max:50'],
+            'name' => ['required', 'string', 'max:255', 'unique:leagues,name'],
+            'code' => ['nullable', 'string', 'max:50', 'unique:leagues,code'],
+            'province' => ['nullable', 'string', 'max:255'],
+            'headquarters' => ['nullable', 'string', 'max:255'],
+            'contact_email' => ['nullable', 'email', 'max:255'],
+            'contact_phone' => ['nullable', 'string', 'max:50'],
         ];
     }
 
     protected function updateRules(): array
     {
         return [
-            'editName'          => ['required','string','max:255','unique:leagues,name,'.$this->editLeagueId],
-            'editCode'          => ['nullable','string','max:50','unique:leagues,code,'.$this->editLeagueId],
-            'editProvince'      => ['nullable','string','max:255'],
-            'editHeadquarters'  => ['nullable','string','max:255'],
-            'editContactEmail'  => ['nullable','email','max:255'],
-            'editContactPhone'  => ['nullable','string','max:50'],
+            'editName' => ['required', 'string', 'max:255', 'unique:leagues,name,' . $this->editLeagueId],
+            'editCode' => ['nullable', 'string', 'max:50', 'unique:leagues,code,' . $this->editLeagueId],
+            'editProvince' => ['nullable', 'string', 'max:255'],
+            'editHeadquarters' => ['nullable', 'string', 'max:255'],
+            'editContactEmail' => ['nullable', 'email', 'max:255'],
+            'editContactPhone' => ['nullable', 'string', 'max:50'],
         ];
     }
 
@@ -88,7 +87,7 @@ new class extends Component
 
         app(CreateLeague::class)($validated);
 
-        $this->reset(['name','province','headquarters','contact_email','contact_phone']);
+        $this->reset(['name', 'province', 'headquarters', 'contact_email', 'contact_phone']);
         session()->flash('message', __('League created successfully.'));
 
         $this->resetPage();
@@ -101,13 +100,13 @@ new class extends Component
 
         $league = League::findOrFail($id);
 
-        $this->editLeagueId       = $league->id;
-        $this->editName           = $league->name;
-        $this->editCode           = $league->code;
-        $this->editProvince       = $league->province;
-        $this->editHeadquarters   = $league->headquarters;
-        $this->editContactEmail   = $league->contact_email;
-        $this->editContactPhone   = $league->contact_phone;
+        $this->editLeagueId = $league->id;
+        $this->editName = $league->name;
+        $this->editCode = $league->code;
+        $this->editProvince = $league->province;
+        $this->editHeadquarters = $league->headquarters;
+        $this->editContactEmail = $league->contact_email;
+        $this->editContactPhone = $league->contact_phone;
     }
 
     public function updateLeague(): void
@@ -119,10 +118,10 @@ new class extends Component
         $league = League::findOrFail($this->editLeagueId);
 
         app(UpdateLeague::class)($league, [
-            'name'          => $this->editName,
-            'code'          => $this->editCode,
-            'province'      => $this->editProvince,
-            'headquarters'  => $this->editHeadquarters,
+            'name' => $this->editName,
+            'code' => $this->editCode,
+            'province' => $this->editProvince,
+            'headquarters' => $this->editHeadquarters,
             'contact_email' => $this->editContactEmail,
             'contact_phone' => $this->editContactPhone,
         ]);
@@ -143,12 +142,12 @@ new class extends Component
         $this->resetPage();
         $this->dispatch('leagues:refresh');
     }
-    
+
 };
 
 ?>
 
-<section class="container mx-auto h-full w-full max-w-7xl px-6">
+<section class="bg-white rounded-3xl py-6 container mx-auto h-full w-full max-w-7xl px-6">
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
 
@@ -162,11 +161,15 @@ new class extends Component
             </label>
             <div class="relative">
                 <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                     </svg>
                 </div>
-                <input type="text" id="default-search" wire:model.debounce.300ms="search" class="block w-full p-3 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="{{ __("Search by name") }}" required />
+                <input type="text" id="default-search" wire:model.debounce.300ms="search"
+                    class="block w-full p-3 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="{{ __("Search by name") }}" required />
             </div>
         </div>
 
@@ -176,7 +179,8 @@ new class extends Component
     </div>
 
     {{-- Tableau --}}
-    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-neutral-200 dark:border-neutral-700 rounded-xl">
+    <table
+        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-neutral-200 dark:border-neutral-700 rounded-xl">
         <thead class="text-xs text-gray-700 dark:text-gray-400 uppercase">
             <tr>
                 <th scope="col" class="px-6 py-3">{{ __("Name") }}</th>
@@ -188,31 +192,33 @@ new class extends Component
             </tr>
         </thead>
         <tbody>
-        @foreach($leagues as $league)
-            <tr class="border-b border-neutral-200 dark:border-neutral-700">
-                <td class="px-6 py-4">{{ $league->name }}</td>
-                <td class="px-6 py-4">{{ $league->code }}</td>
-                <td class="px-6 py-4">{{ $league->province }}</td>
-                <td class="px-6 py-4">{{ $league->headquarters }}</td>
-                <td class="px-6 py-4">
-                    {{ $league->contact_email }}<br>
-                    {{ $league->contact_phone }}
-                </td>
-                <td class="px-6 py-4">
-                    <div class="flex gap-2">
-                        {{-- Edit --}}
-                        <flux:modal.trigger name="edit-league-{{ $league->id }}">
-                            <flux:button wire:click="editLeague({{ $league->id }})" size="sm" class="cursor-pointer">{{ __("Edit") }}</flux:button>
-                        </flux:modal.trigger>
+            @foreach($leagues as $league)
+                <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                    <td class="px-6 py-4">{{ $league->name }}</td>
+                    <td class="px-6 py-4">{{ $league->code }}</td>
+                    <td class="px-6 py-4">{{ $league->province }}</td>
+                    <td class="px-6 py-4">{{ $league->headquarters }}</td>
+                    <td class="px-6 py-4">
+                        {{ $league->contact_email }}<br>
+                        {{ $league->contact_phone }}
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex gap-2">
+                            {{-- Edit --}}
+                            <flux:modal.trigger name="edit-league-{{ $league->id }}">
+                                <flux:button wire:click="editLeague({{ $league->id }})" size="sm" class="cursor-pointer">
+                                    {{ __("Edit") }}</flux:button>
+                            </flux:modal.trigger>
 
-                        {{-- Delete --}}
-                        <flux:modal.trigger name="delete-league-{{ $league->id }}">
-                            <flux:button variant="danger" size="sm" class="cursor-pointer">{{ __("Delete") }}</flux:button>
-                        </flux:modal.trigger>
-                    </div>
-                </td>
-            </tr>
-        @endforeach
+                            {{-- Delete --}}
+                            <flux:modal.trigger name="delete-league-{{ $league->id }}">
+                                <flux:button variant="danger" size="sm" class="cursor-pointer">{{ __("Delete") }}
+                                </flux:button>
+                            </flux:modal.trigger>
+                        </div>
+                    </td>
+                </tr>
+            @endforeach
         </tbody>
     </table>
 
@@ -242,7 +248,8 @@ new class extends Component
 
     {{-- Modal Edit --}}
     @foreach($leagues as $league)
-        <flux:modal name="edit-league-{{ $league->id }}" class="md:w-96" wire:key="edit-league-{{ $league->id }}" variant="flyout">
+        <flux:modal name="edit-league-{{ $league->id }}" class="md:w-96" wire:key="edit-league-{{ $league->id }}"
+            variant="flyout">
             <div class="space-y-4">
                 <flux:heading size="lg">{{ __("Edit league") }}</flux:heading>
 
@@ -272,10 +279,7 @@ new class extends Component
                     </flux:modal.close>
 
                     <flux:modal.close>
-                        <flux:button
-                            wire:click="deleteLeague({{ $league->id }})"
-                            variant="danger"
-                        >
+                        <flux:button wire:click="deleteLeague({{ $league->id }})" variant="danger">
                             {{ __("Confirm") }}
                         </flux:button>
                     </flux:modal.close>
