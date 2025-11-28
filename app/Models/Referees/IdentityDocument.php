@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Referee;
+namespace App\Models\Referees;
 
 use App\Models\Referees\Referee;
 use Illuminate\Database\Eloquent\Model;

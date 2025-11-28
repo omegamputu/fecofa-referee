@@ -25,7 +25,7 @@ return new class extends Migration
                 ->restrictOnDelete();
 
             // Identifiant interne type LIFKIN-AR-001
-            $table->string('code')->unique()->nullable();
+            $table->string('person_id')->unique()->nullable();
 
             // Infos perso
             $table->string('last_name');          // NOM
@@ -51,6 +51,10 @@ return new class extends Migration
                 'stagiaire',
                 'UNE'
             ])->nullable();
+
+            // Critères d’acceptation (FIFA style)
+            $table->boolean('has_medical_clearance')->default(false);
+            $table->boolean('has_physical_clearance')->default(false);
 
             $table->boolean('is_active')->default(true);
             $table->boolean('is_fifa_listed')->default(false);

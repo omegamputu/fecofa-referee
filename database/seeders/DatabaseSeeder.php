@@ -17,5 +17,6 @@ class DatabaseSeeder extends Seeder
 
         $this->call(RoleAndPermissionSeeder::class);
         $this->call(LeagueSeeder::class);
+        $this->call(RefereeRoleSeeder::class);
     }
 }

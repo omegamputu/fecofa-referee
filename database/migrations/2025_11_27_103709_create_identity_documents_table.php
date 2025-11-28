@@ -17,7 +17,7 @@ return new class extends Migration
                 ->constrained('referees')
                 ->cascadeOnDelete();
 
-            $table->enum('type', ['passport', 'voter_card', 'id_card', 'other']);
+            $table->enum('type', ['passport', 'national_id', 'other'])->nullable();
             $table->string('number')->nullable();
             $table->date('issue_date')->nullable();
             $table->date('expiry_date')->nullable();

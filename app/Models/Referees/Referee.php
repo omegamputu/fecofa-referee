@@ -3,20 +3,23 @@
 namespace App\Models\Referees;
 
 use App\Models\League;
-use App\Models\Referee\IdentityDocument;
-use App\Models\Referee\RefereeMedicalExam;
-use App\Models\Referee\RefereePhysicalTest;
-use App\Models\Referee\RefereeSeason;
+use App\Models\Referees\IdentityDocument;
+use App\Models\Referees\RefereeMedicalExam;
+use App\Models\Referees\RefereePhysicalTest;
+use App\Models\Referees\RefereeSeason;
+use App\Models\Referees\RefereeRole;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Referee extends Model
 {
     //
     protected $fillable = [
+        'league_id',
         'referee_role_id',
-        'code',
+        'person_id',
         'last_name',
         'first_name',
         'date_of_birth',
@@ -28,6 +31,8 @@ class Referee extends Model
         'profession',
         'start_year',
         'category',
+        'has_medical_clearance',
+        'has_physical_clearance',
         'is_active',
         'is_fifa_listed',
         'profile_photo_path',
@@ -44,14 +49,14 @@ class Referee extends Model
         return $this->belongsTo(League::class);
     }
 
-    public function role(): BelongsTo
+    public function refereeRole(): BelongsTo
     {
         return $this->belongsTo(RefereeRole::class, 'referee_role_id');
     }
 
-    public function identityDocuments(): HasMany
+    public function identityDocument(): HasOne
     {
-        return $this->hasMany(IdentityDocument::class);
+        return $this->hasOne(IdentityDocument::class);
     }
 
     public function medicalExams(): HasMany

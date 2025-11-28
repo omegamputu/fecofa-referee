@@ -19,69 +19,139 @@ class RoleAndPermissionSeeder extends Seeder
         // Nettoyage (facultatif)
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
+         /*
+        |--------------------------------------------------------------------------
+        | Définition des permissions
+        |--------------------------------------------------------------------------
+        */
         $permissions = [
-            'manage_users','manage_roles','manage_permissions',
-            'manage_settings','view_audit_logs','backup_database',
-            'restore_database', 'generate_reports','export_internal_list',
-            'import_referee_data', 'view_referee', 'edit_referee',
-            'delete_referee', 'assign_referee', 'edit_assignment',
-            'view_assignment', 'delete_assignment','record_evaluation',
-            'view_evaluation','manage_trainings', 'admin_access', 'manage_admins',
-            'manage_leagues', 'manage_matches', 'manage_seasons',
+            // Core / Admin système
+            'manage_users',
+            'manage_roles',
+            'manage_permissions',
+            'manage_settings',
+            'view_audit_logs',
+            'backup_database',
+            'restore_database',
+            'generate_reports',
+            'admin_access',
 
-            // Dept Arbitrage
-            'create_referee','edit_referee','view_referee',
-            'assign_match','edit_assignment','view_assignment',
-            'record_evaluation','view_evaluation', 'manage_trainings',
-            'generate_reports', 'export_internal_list', 'import_referee_data'
+            // Gestion des données FECOFA
+            'manage_leagues',
+            'manage_matches',
+            'manage_seasons',
+
+            // Import / export
+            'export_internal_list',
+            'import_referee_data',
+
+            // Arbitres (granulaire)
+            'view_referee',
+            'create_referee',
+            'edit_referee',
+            'delete_referee',
+
+            // Affectations
+            'assign_match',
+            'edit_assignment',
+            'view_assignment',
+            'delete_assignment',
+
+            // Suivi & formations
+            'record_evaluation',
+            'view_evaluation',
+            'manage_trainings',
+
+            // Permission "chapeau"
+            'manage_referees', // => donne accès global à la gestion des arbitres
         ];
 
-        foreach ($permissions as $p) {
-            Permission::findOrCreate($p, 'web');
+        foreach ($permissions as $name) {
+            Permission::findOrCreate($name, 'web');
         }
 
-        // Role
+        /*
+        |--------------------------------------------------------------------------
+        | Rôles
+        |--------------------------------------------------------------------------
+        */
         $owner = Role::findOrCreate('Owner', 'web');
         $admin = Role::findOrCreate('Administrator', 'web');
         $member = Role::findOrCreate('Member', 'web');
         $viewer = Role::findOrCreate('Viewer', 'web');
 
+        // --- ADMINISTRATOR ---
         $admin->syncPermissions([
-            'manage_users','manage_roles','manage_permissions',
-            'manage_settings','view_audit_logs','backup_database',
-            'restore_database', 'generate_reports','export_internal_list',
-            'import_referee_data', 'admin_access'
+            'manage_users',
+            'manage_roles',
+            'manage_permissions',
+            'manage_settings',
+            'view_audit_logs',
+            'backup_database',
+            'restore_database',
+            'generate_reports',
+            'export_internal_list',
+            'import_referee_data',
+            'manage_leagues',
+            'manage_matches',
+            'manage_seasons',
+            'manage_referees',  // accès complet aux arbitres
+            'admin_access',
         ]);
 
+        // --- MEMBER (Département arbitrage, CNA, etc.) ---
         $member->syncPermissions([
-            'create_referee','edit_referee','view_referee',
-            'assign_match','edit_assignment','view_assignment',
-            'record_evaluation','view_evaluation', 'manage_trainings',
-            'generate_reports', 'export_internal_list', 'import_referee_data'
+            'manage_referees',      // clé pour tous les écrans arbitres
+            'view_referee',
+            'create_referee',
+            'edit_referee',
+            'delete_referee',
+
+            'assign_match',
+            'edit_assignment',
+            'view_assignment',
+            'delete_assignment',
+
+            'record_evaluation',
+            'view_evaluation',
+            'manage_trainings',
+
+            'generate_reports',
+            'export_internal_list',
+            'import_referee_data',
         ]);
 
+        // --- VIEWER (consultation uniquement) ---
         $viewer->syncPermissions([
-            'view_referee','view_assignment','view_evaluation',
-            'generate_reports', 'export_internal_list'
+            'view_referee',
+            'view_assignment',
+            'view_evaluation',
+            'generate_reports',
+            'export_internal_list',
         ]);
 
+        // --- OWNER = tous les droits ---
         $owner->syncPermissions(Permission::all());
 
-        // ---- Super-Admin par défaut (via variables d'env si dispos)
+        /*
+        |--------------------------------------------------------------------------
+        | Super Admin par défaut
+        |--------------------------------------------------------------------------
+        */
         $email = env('SUPER_ADMIN_EMAIL', 'superadmin@fecofa.cd');
         $pass  = env('SUPER_ADMIN_PASSWORD', 'Ref@dmin#2025');
 
         $user = User::firstOrCreate(
             ['email' => $email],
             [
-                'name' => 'Super Admin',
+                'name'     => 'Super Admin',
                 'password' => Hash::make($pass),
             ]
         );
 
         $user->forceFill(['password_set_at' => now()])->save();
-
         $user->syncRoles(['Owner']);
+
 
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
     }

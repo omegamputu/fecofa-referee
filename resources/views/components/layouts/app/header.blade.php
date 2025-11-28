@@ -26,15 +26,10 @@
                 class="{{ $baseLink }} {{ request()->routeIs('admin.dashboard') ? '!text-white !font-semibold' : '' }}">
                 {{ __('Dashboard') }}
             </flux:navbar.item>
-            <flux:navbar.item icon="users" :href="route('admin.users.index')"
-                :current="request()->routeIs('admin.users.index')" wire:navigate
-                class="{{ $baseLink }} {{ request()->routeIs('admin.users.index') ? '!text-white !font-semibold' : '' }}">
-                {{ __('Manage users') }}
-            </flux:navbar.item>
-            <flux:navbar.item icon="building-office" :href="route('admin.leagues.index')"
-                :current="request()->routeIs('admin.leagues.index')" wire:navigate
-                class="{{ $baseLink }} {{ request()->routeIs('admin.leagues.index') ? '!text-white !font-semibold' : '' }}">
-                {{ __('Manage leagues') }}
+            <flux:navbar.item icon="queue-list" :href="route('admin.referees.index')"
+                :current="request()->routeIs('admin.referees.index')" wire:navigate
+                class="{{ $baseLink }} {{ request()->routeIs('admin.referees.index') ? '!text-white !font-semibold' : '' }}">
+                {{ __('Referees') }}
             </flux:navbar.item>
         </flux:navbar>
 
@@ -78,6 +73,12 @@
                 <flux:menu.separator />
 
                 <flux:menu.radio.group>
+                    <flux:menu.item icon="users" :href="route('admin.users.index')" wire:navigate>
+                        {{ __('Manage users') }}
+                    </flux:menu.item>
+                    <flux:menu.item icon="building-office" :href="route('admin.leagues.index')" wire:navigate>
+                        {{ __('Manage leagues') }}
+                    </flux:menu.item>
                     <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}
                     </flux:menu.item>
                 </flux:menu.radio.group>
