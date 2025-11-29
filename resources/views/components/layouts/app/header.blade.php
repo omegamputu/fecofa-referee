@@ -31,6 +31,11 @@
                 class="{{ $baseLink }} {{ request()->routeIs('admin.referees.index') ? '!text-white !font-semibold' : '' }}">
                 {{ __('Referees') }}
             </flux:navbar.item>
+            <flux:navbar.item icon="academic-cap" :href="route('admin.referees.categories.index')"
+                :current="request()->routeIs('admin.referees.categories.index')" wire:navigate
+                class="{{ $baseLink }} {{ request()->routeIs('admin.referees.categories.index') ? '!text-white !font-semibold' : '' }}">
+                {{ __('Categories') }}
+            </flux:navbar.item>
         </flux:navbar>
 
         <flux:spacer />
