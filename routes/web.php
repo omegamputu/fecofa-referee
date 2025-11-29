@@ -25,6 +25,8 @@ Route::middleware(['auth', 'permission:admin_access', 'must_set_password'])
         Volt::route('/users', 'admin.users.index')->name('users.index');
         Volt::route('/leagues', 'admin.leagues.index')->name('leagues.index');
 
+        Volt::route('/referees/categories', 'admin.referees.categories.index')->name('referees.categories.index');
+
         Volt::route('/referees', 'admin.referees.index')->name('referees.index');
         Volt::route('/referees/create', 'admin.referees.create')->name('referees.create');
         Volt::route('/referees/{referee}/edit', 'admin.referees.edit')

@@ -126,7 +126,7 @@ new class extends Component {
             'contact_phone' => $this->editContactPhone,
         ]);
 
-        session()->flash('message', __('League updated successfully.'));
+        session()->flash('status', __('League updated successfully.'));
         $this->dispatch('leagues:refresh');
     }
 

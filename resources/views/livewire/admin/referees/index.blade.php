@@ -5,6 +5,7 @@ use Livewire\WithPagination;
 use App\Models\League;
 use App\Models\Referees\Referee;
 use App\Models\Referees\RefereeRole;
+use App\Models\Referees\RefereeCategory;
 
 new class extends Component {
 
@@ -16,11 +17,13 @@ new class extends Component {
     public ?int $roleFilter = null;
 
     public array $leagues = [];
+    public array $categories = [];
     public array $roles = [];
 
     public function mount(): void
     {
         $this->leagues = League::orderBy('code')->get(['id', 'code', 'name'])->toArray();
+        $this->categories = RefereeCategory::orderBy('id')->get(['id', 'name'])->toArray();
         $this->roles = RefereeRole::orderBy('name')->get(['id', 'name'])->toArray();
     }
 
@@ -41,10 +44,9 @@ new class extends Component {
 
     public function with(): array
     {
-        //dd($this->search, $this->leagueFilter, $this->roleFilter);
 
         $query = Referee::query()
-            ->with(['league', 'refereeRole'])
+            ->with(['league', 'refereeCategory', 'refereeRole'])
             // 🔍 recherche texte
             ->when(filled($this->search), function ($q) {
                 $search = '%' . $this->search . '%';
@@ -65,7 +67,7 @@ new class extends Component {
             })
             // 🎯 filtre Category
             ->when(filled($this->categoryFilter), function ($q) {
-                $q->where('category', $this->categoryFilter);
+                $q->where('referee_category_id', $this->categoryFilter);
             })
             ->orderBy('id', 'asc');
 
@@ -97,14 +99,23 @@ new class extends Component {
 
     <div class="flex items-center justify-between mb-6 gap-4">
         <div class="flex flex-1 gap-2">
-            <flux:input class="w-full" icon="magnifying-glass" placeholder="{{ __('Search by name or code') }}"
-                wire:model.live.debounce.400ms="search" />
+            <flux:input class="w-full" icon="magnifying-glass"
+                placeholder="{{ __('Search by name, category or code') }}" wire:model.live.debounce.400ms="search" />
 
             <flux:select wire:model="leagueFilter" placeholder="{{ __('League') }}" class="w-48">
                 <flux:select.option value="">{{ __('All leagues') }}</flux:select.option>
                 @foreach($leagues as $league)
                     <flux:select.option value="{{ $league['id'] }}">
                         {{ $league['code'] }} – {{ $league['name'] }}
+                    </flux:select.option>
+                @endforeach
+            </flux:select>
+
+            <flux:select wire:model="categoryFilter" placeholder="{{ __('Category') }}" class="w-48">
+                <flux:select.option value="">{{ __('All categories') }}</flux:select.option>
+                @foreach($categories as $category)
+                    <flux:select.option value="{{ $category['id'] }}">
+                        {{ $category['name'] }}
                     </flux:select.option>
                 @endforeach
             </flux:select>
@@ -197,7 +208,7 @@ new class extends Component {
 
                     {{-- Category --}}
                     <td class="px-4 py-3 text-center">
-                        {{ ucfirst($referee->category) }}
+                        {{ ucfirst($referee->refereeCategory?->name) }}
                     </td>
 
                     {{-- Fonction --}}

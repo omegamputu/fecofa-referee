@@ -18,6 +18,7 @@ class Referee extends Model
     //
     protected $fillable = [
         'league_id',
+        'referee_category_id',
         'referee_role_id',
         'person_id',
         'last_name',
@@ -47,6 +48,11 @@ class Referee extends Model
     public function league(): BelongsTo
     {
         return $this->belongsTo(League::class);
+    }
+
+    public function refereeCategory(): BelongsTo
+    {
+        return $this->belongsTo(RefereeCategory::class, 'referee_category_id');
     }
 
     public function refereeRole(): BelongsTo

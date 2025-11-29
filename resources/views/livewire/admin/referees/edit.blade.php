@@ -6,7 +6,7 @@ use App\Models\Referees\Referee;
 use Illuminate\Support\Facades\DB;
 use App\Models\League;
 use App\Models\Referees\RefereeRole;
-use App\Models\Referees\IdentityDocument;
+use App\Models\Referees\RefereeCategory;
 use Illuminate\Validation\Rule;
 
 new class extends Component {
@@ -34,7 +34,7 @@ new class extends Component {
     public int $originalLeagueId; // Pour vérifier si la ligue a changé
     public ?int $league_id = null;
     public ?int $start_year = null;
-    public ?string $category = null;
+    public ?int $referee_category_id = null;
     public ?int $referee_role_id = null;
 
     // Upload photo
@@ -43,6 +43,7 @@ new class extends Component {
 
     // Listes pour les <select>
     public $leagues = [];
+    public $categories = [];
     public $roles = [];
 
 
@@ -53,6 +54,10 @@ new class extends Component {
         // ----- 1. Précharger les listes -----
         $this->leagues = League::select('id', 'code', 'name')
             ->orderBy('code')
+            ->get();
+
+        $this->categories = RefereeCategory::select('id', 'name')
+            ->orderBy('name')
             ->get();
 
         $this->roles = RefereeRole::select('id', 'name')
@@ -74,7 +79,7 @@ new class extends Component {
         $this->originalLeagueId = $referee->league_id; // Pour vérifier si la ligue a changé
 
         $this->league_id = $referee->league_id;
-        $this->category = $referee->category;
+        $this->referee_category_id = $referee->referee_category_id;
         $this->start_year = $referee->start_year;
         $this->referee_role_id = $referee->referee_role_id;
 
@@ -137,7 +142,7 @@ new class extends Component {
             'address' => ['nullable', 'string'],
 
             'league_id' => ['required', 'exists:leagues,id'],
-            'category' => ['required', 'string', 'max:50'],
+            'referee_category_id' => ['required', 'exists:referee_categories,id'],
             'start_year' => ['nullable', 'integer', 'min:1980', 'max:' . now()->year],
             'referee_role_id' => ['required', 'exists:referee_roles,id'],
 
@@ -206,7 +211,7 @@ new class extends Component {
                 'address' => $this->address,
 
                 'league_id' => $this->league_id,
-                'category' => $this->category,
+                'referee_category_id' => $this->referee_category_id,
                 'start_year' => $this->start_year,
                 'referee_role_id' => $this->referee_role_id,
             ]);
@@ -445,23 +450,14 @@ new class extends Component {
                     <flux:input type="number" wire:model.defer="start_year" label="{{ __('Start year') }}" min="1980"
                         placeholder="Ex: 2008" class="mb-2" />
 
-                    <flux:select label="{{ __('Category') }}" wire:model.defer="category" class="mb-2" required>
+                    <flux:select label="{{ __('Category') }}" wire:model.defer="referee_category_id" class="mb-2"
+                        required>
                         <flux:select.option value="">{{ __('Select category') }}</flux:select.option>
-                        <flux:select.option value="internationale">
-                            {{ __("International") }}
-                        </flux:select.option>
-                        <flux:select.option value="nationale">
-                            {{ __("National") }}
-                        </flux:select.option>
-                        <flux:select.option value="SN">
-                            {{ __("SN") }}
-                        </flux:select.option>
-                        <flux:select.option value="stagiaire">
-                            {{ __("Intern") }}
-                        </flux:select.option>
-                        <flux:select.option value="UNE">
-                            {{ __("UNE") }}
-                        </flux:select.option>
+                        @foreach ($categories as $category)
+                            <flux:select.option value="{{ $category['id'] }}">
+                                {{ $category['name'] }}
+                            </flux:select.option>
+                        @endforeach
                     </flux:select>
 
                     <flux:select label="{{ __('Function') }}" wire:model.defer="referee_role_id" required>
