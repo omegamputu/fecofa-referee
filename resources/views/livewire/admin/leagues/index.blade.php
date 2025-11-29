@@ -180,8 +180,8 @@ new class extends Component {
 
     {{-- Tableau --}}
     <table
-        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-neutral-200 dark:border-neutral-700 rounded-xl">
-        <thead class="text-xs text-gray-700 dark:text-gray-400 uppercase">
+        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 bg-white py-6 px-6 rounded-xl">
+        <thead class="text-xs text-gray-700 dark:text-gray-400">
             <tr>
                 <th scope="col" class="px-6 py-3">{{ __("Name") }}</th>
                 <th scope="col" class="px-6 py-3">{{ __("Code") }}</th>
@@ -193,7 +193,7 @@ new class extends Component {
         </thead>
         <tbody>
             @foreach($leagues as $league)
-                <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                <tr>
                     <td class="px-6 py-4">{{ $league->name }}</td>
                     <td class="px-6 py-4">{{ $league->code }}</td>
                     <td class="px-6 py-4">{{ $league->province }}</td>

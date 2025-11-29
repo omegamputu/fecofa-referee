@@ -146,7 +146,7 @@ new class extends Component {
         $this->authorize('toggle', $user);
 
         // Appelle l'action manuellement via le conteneur
-        app(\App\Actions\Users\ToggleActive::class)($user);
+        app(ToggleActive::class)($user);
 
         session()->flash('status', __('User status updated.'));
     }
@@ -234,8 +234,8 @@ new class extends Component {
     </div>
 
     <table
-        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-neutral-200 dark:border-neutral-700 rounded-xl">
-        <thead class="text-xs text-gray-700 dark:text-gray-400 uppercase">
+        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 bg-white py-6 px-6 rounded-xl">
+        <thead class="text-xs text-gray-700 dark:text-gray-400">
             <tr>
                 <th scope="col" class="px-6 py-3">
                     {{ __("Name") }}
@@ -256,7 +256,7 @@ new class extends Component {
         </thead>
         <tbody>
             @foreach($users as $u)
-                <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                <tr>
                     <th scope="row" class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
                         <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
                             <span

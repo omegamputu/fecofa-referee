@@ -1,22 +1,15 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Referees;
 
-use App\Models\Referees\Referee;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class League extends Model
+class RefereeRole extends Model
 {
     //
     protected $fillable = [
-        'name',
-        'slug',
-        'code',
-        'province',
-        'headquarters',
-        'contact_email',
-        'contact_phone',
+        'name', 'slug', 'description'
     ];
 
     public function referees(): HasMany
