@@ -62,7 +62,7 @@ new class extends Component {
             ->when(filled($this->roleFilter), function ($q) {
                 $q->where('referee_role_id', $this->roleFilter);
             })
-            ->orderBy('last_name');
+            ->orderBy('id', 'asc');
 
         return [
             'referees' => $query->paginate(15),
@@ -118,6 +118,14 @@ new class extends Component {
             :href="route('admin.referees.create')" wire:navigate>
             {{ __('Add referee') }}
         </flux:button>
+
+        <a href="{{ route('referees.export', [
+    'search' => $search ?? null,
+    'league' => $leagueFilter ?? null,
+    'role' => $roleFilter ?? null,
+]) }}" class="inline-flex items-center rounded-lg bg-white border px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
+            Export PDF
+        </a>
     </div>
 
     <table
