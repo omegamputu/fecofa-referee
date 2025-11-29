@@ -12,6 +12,7 @@ new class extends Component {
 
     public string $search = '';
     public ?int $leagueFilter = null;
+    public ?int $categoryFilter = null;
     public ?int $roleFilter = null;
 
     public array $leagues = [];
@@ -61,6 +62,10 @@ new class extends Component {
             // 🎯 filtre Fonction
             ->when(filled($this->roleFilter), function ($q) {
                 $q->where('referee_role_id', $this->roleFilter);
+            })
+            // 🎯 filtre Category
+            ->when(filled($this->categoryFilter), function ($q) {
+                $q->where('category', $this->categoryFilter);
             })
             ->orderBy('id', 'asc');
 
