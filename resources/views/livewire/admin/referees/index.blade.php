@@ -151,10 +151,17 @@ new class extends Component {
                     {{-- Colonne arbitre --}}
                     <td class="px-4 py-3">
                         <div class="flex items-center gap-3">
-                            <span
-                                class="relative flex h-9 w-9 shrink-0 overflow-hidden rounded-full bg-neutral-700 text-xs font-semibold items-center justify-center">
-                                {{ strtoupper(Str::substr($referee->first_name, 0, 1) . Str::substr($referee->last_name, 0, 1)) }}
-                            </span>
+                            @if($referee->profile_photo_path)
+                                <img src="{{ asset('storage/' . $referee->profile_photo_path) }}" alt="Referee photo"
+                                    class="h-9 w-9 shrink-0 overflow-hidden rounded-full object-cover">
+                            @else
+
+                                <span
+                                    class="relative flex h-9 w-9 shrink-0 overflow-hidden rounded-full bg-neutral-700 text-xs font-semibold items-center justify-center">
+                                    {{ strtoupper(Str::substr($referee->first_name, 0, 1) . Str::substr($referee->last_name, 0, 1)) }}
+                                </span>
+
+                            @endif
 
                             <div>
                                 <div class="font-semibold">

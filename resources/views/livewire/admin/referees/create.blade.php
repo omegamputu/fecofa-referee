@@ -71,6 +71,19 @@ new class extends Component {
         }
     }
 
+    protected function uploadProfilePhoto(): ?string
+    {
+        if (!$this->profile_photo) {
+            return null;
+        }
+
+        // 👉 Dossier exact souhaité
+        return $this->profile_photo->store(
+            'referees/profile_photos', // <— sous-dossier ici
+            'public'                   // disk "public"
+        );
+    }
+
     // Règles de validation
     public function rules(): array
     {
@@ -137,9 +150,9 @@ new class extends Component {
             }
 
             // 3.6 Upload de la photo éventuelle
-            $photoPath = null;
+            //$photoPath = $this->updatedProfilePhoto();
             if ($this->profile_photo) {
-                $photoPath = $this->profile_photo->store('referees/profile_photos', 'public');
+                $photoPath = $this->uploadProfilePhoto();
             }
 
             $startYear = $this->updatedStartYear($data['start_year']);

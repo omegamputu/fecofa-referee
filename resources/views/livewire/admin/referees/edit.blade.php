@@ -108,6 +108,19 @@ new class extends Component {
         }
     }
 
+    protected function uploadProfilePhoto(): ?string
+    {
+        if (!$this->profile_photo) {
+            return null;
+        }
+
+        // 👉 Dossier exact souhaité
+        return $this->profile_photo->store(
+            'referees/profile_photos', // <— sous-dossier ici
+            'public'                   // disk "public"
+        );
+    }
+
     // Règles de validation
     public function rules(): array
     {
@@ -200,7 +213,8 @@ new class extends Component {
 
             // b) Gestion de la photo (si nouvelle)
             if ($this->profile_photo) {
-                $path = $this->profile_photo->store('referees', 'public');
+                //$path = $this->profile_photo->store('referees', 'public');
+                $path = $this->uploadProfilePhoto();
                 $this->referee->profile_photo_path = $path;
             }
 
@@ -313,7 +327,7 @@ new class extends Component {
                         </div>
 
                         {{-- Photo de profil --}}
-                        <div class="flex flex-col items-center gap-4">
+                        <div class="flex flex-col items-start gap-4">
                             @if ($profile_photo_preview)
                                 <div class="border p-2">
                                     <img src="{{ $profile_photo_preview }}" class="h-12 w-12 rounded object-cover"
@@ -321,7 +335,7 @@ new class extends Component {
                                 </div>
                             @elseif(!empty($referee?->profile_photo_path ?? null))
                                 <img src="{{ asset('storage/' . $referee->profile_photo_path) }}"
-                                    class="h-12 w-12 rounded object-cover" alt="Referee photo">
+                                    class="h-24 w-24 rounded object-cover overflow-hidden" alt="Referee photo">
                             @else
                                 <div class="col-span-full">
                                     <label for="photo" class="block text-sm/6 font-medium text-white">Photo</label>
