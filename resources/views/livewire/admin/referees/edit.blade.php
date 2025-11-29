@@ -1,17 +1,18 @@
 <?php
 
 use Livewire\Volt\Component;
+use Livewire\WithFileUploads;
+use App\Models\Referees\Referee;
 use Illuminate\Support\Facades\DB;
 use App\Models\League;
 use App\Models\Referees\RefereeRole;
-use App\Models\Referees\Referee;
 use App\Models\Referees\IdentityDocument;
-use Livewire\WithFileUploads;
-use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 
 new class extends Component {
     use WithFileUploads;
+
+    public ?Referee $referee = null;
 
     // Champs du formulaire
     public string $last_name = '';
@@ -29,7 +30,8 @@ new class extends Component {
     public ?string $number = null;
     public ?string $issue_date = null;
     public ?string $expiry_date = null;
-
+    //
+    public int $originalLeagueId; // Pour vérifier si la ligue a changé
     public ?int $league_id = null;
     public ?int $start_year = null;
     public ?string $category = null;
@@ -39,34 +41,69 @@ new class extends Component {
     public $profile_photo = null;
     public ?string $profile_photo_preview = null;
 
-    // Chargement des listes (ligues, rôles)
-    public function with(): array
-    {
-        return [
-            'leagues' => League::select('id', 'code', 'name')->orderBy('code')->get()->toArray(),
-            'roles' => RefereeRole::select('id', 'name')->orderBy('name')->get()->toArray(),
-        ];
-    }
+    // Listes pour les <select>
+    public $leagues = [];
+    public $roles = [];
 
-    public function updatedStartYear($value): void
-    {
-        if ($value && is_numeric($value)) {
-            $year = intval($value);
 
-            if ($year >= 1980 && $year <= now()->year + 1) {
-                $this->referee_start_year = $year;
-            } else {
-                $this->addError('start_year', __('Invalid year'));
-            }
+    public function mount(Referee $referee)
+    {
+        $this->referee = $referee;
+
+        // ----- 1. Précharger les listes -----
+        $this->leagues = League::select('id', 'code', 'name')
+            ->orderBy('code')
+            ->get();
+
+        $this->roles = RefereeRole::select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
+        // ----- 2. Hydrater les champs depuis le modèle -----
+        $this->last_name = $referee->last_name;
+        $this->first_name = $referee->first_name;
+        $this->date_of_birth = $referee->date_of_birth?->format('Y-m-d');
+        $this->gender = $referee->gender;
+        $this->education_level = $referee->education_level;
+        $this->profession = $referee->profession;
+
+        $this->phone = $referee->phone;
+        $this->email = $referee->email;
+        $this->address = $referee->address;
+
+        $this->originalLeagueId = $referee->league_id; // Pour vérifier si la ligue a changé
+
+        $this->league_id = $referee->league_id;
+        $this->category = $referee->category;
+        $this->start_year = $referee->start_year;
+        $this->referee_role_id = $referee->referee_role_id;
+
+        // ----- 3. Document d’identité existant (s’il y en a un) -----
+        /** @var \App\Models\Referees\IdentityDocument|null $doc */
+        $doc = $referee->identityDocument()->first();
+
+        if ($doc) {
+            $this->identity_type = $doc->type;
+            $this->number = $doc->number;
+            $this->issue_date = $doc->issue_date?->format('Y-m-d');
+            $this->expiry_date = $doc->expiry_date?->format('Y-m-d');
         }
+
+        // La preview ne sert que pour un nouveau fichier ; la photo actuelle
+        // est affichée dans le Blade via $referee->profile_photo_path.
+        $this->profile_photo_preview = null;
     }
 
-    // Preview de la photo quand on choisit un fichier
+    /**
+     * Preview live quand on choisit une nouvelle photo
+     */
     public function updatedProfilePhoto(): void
     {
-        $this->validateOnly('profile_photo');
-
         if ($this->profile_photo) {
+            $this->validateOnly('profile_photo', [
+                'profile_photo' => ['image', 'max:2048'], // 2 Mo
+            ]);
+
             $this->profile_photo_preview = $this->profile_photo->temporaryUrl();
         }
     }
@@ -78,7 +115,7 @@ new class extends Component {
             'last_name' => ['required', 'string', 'max:255'],
             'first_name' => ['required', 'string', 'max:255'],
             'date_of_birth' => ['nullable', 'date'],
-            'gender' => ['required', Rule::in(['male', 'female'])],
+            'gender' => ['required', 'in:male,female'],
             'education_level' => ['nullable', 'string', 'max:255'],
             'profession' => ['nullable', 'string', 'max:255'],
 
@@ -86,7 +123,14 @@ new class extends Component {
             'email' => ['nullable', 'email', 'max:255'],
             'address' => ['nullable', 'string'],
 
-            'identity_type' => ['nullable', Rule::in(['passport', 'national_id', 'other', ''])],
+            'league_id' => ['required', 'exists:leagues,id'],
+            'category' => ['required', 'string', 'max:50'],
+            'start_year' => ['nullable', 'integer', 'min:1980', 'max:' . now()->year],
+            'referee_role_id' => ['required', 'exists:referee_roles,id'],
+
+            'profile_photo' => ['nullable', 'image', 'max:2048'],
+
+            'identity_type' => ['nullable', Rule::in(['passport', 'national_id', 'other'])],
             'number' => [
                 Rule::requiredIf($this->identity_type === 'passport'),
                 'nullable',
@@ -104,67 +148,65 @@ new class extends Component {
                 'date',
                 'after_or_equal:issue_date',
             ],
-
-            'league_id' => ['required', 'exists:leagues,id'],
-            'start_year' => ['nullable', 'integer', 'min:1980', 'max:' . date('Y')],
-            'category' => ['required', Rule::in(['internationale', 'nationale', 'SN', 'stagiaire', 'UNE'])],
-            'referee_role_id' => ['required', 'exists:referee_roles,id'],
-
-            'profile_photo' => ['nullable', 'image', 'max:2048'], // 2 Mo
         ];
     }
 
-    public function save(): void
+    public function update(): void
     {
+
         //1. Validation des datas
         $data = $this->validate();
 
-        // 2. Récupérer la ligue du referee
-        $league = League::findOrFail($data['league_id']);
+        // ----- 2. Transaction pour tout mettre à jour proprement -----
+        DB::transaction(function () use ($data) {
+            // On recharge avec lock pour éviter la concurrence
+            $referee = Referee::lockForUpdate()->findOrFail($this->referee->id);
 
-        // On aura besoin de $referee après la transaction
-        $referee = null;
+            $leagueChanged = $data['league_id'] !== $this->originalLeagueId;
 
-        // 3. Transaction
-        DB::transaction(function () use ($data, $league, &$referee) {
+            // Si la ligue a changé, il faut générer un NOUVEL ID pour
 
-            $personId = $this->generateRefereeId($league);
+            if ($leagueChanged) {
+                $league = League::findOrFail($data['league_id']);
 
-            // 3.5 Filet de sécurité supplémentaire (au cas où)
-            if (Referee::where('person_id', $personId)->exists()) {
-                // Ici on peut relancer une exception => rollback automatique
-                throw new \RuntimeException("Duplicate referee_id generated: {$personId}");
+                // Génère un NOUVEL ID pour la nouvelle ligue
+                $newPersonId = $this->generateRefereeId($league);
+
+                $referee->update([
+                    'person_id' => $newPersonId,
+                    'league_id' => $league->id,
+                ]);
+
             }
 
-            // 3.6 Upload de la photo éventuelle
-            $photoPath = null;
-            if ($this->profile_photo) {
-                $photoPath = $this->profile_photo->store('referees/profile_photos', 'public');
-            }
+            // a) Mise à jour de l’arbitre
+            $this->referee->fill([
+                'last_name' => $this->last_name,
+                'first_name' => $this->first_name,
+                'date_of_birth' => $this->date_of_birth ?: null,
+                'gender' => $this->gender,
+                'education_level' => $this->education_level,
+                'profession' => $this->profession,
 
-            $startYear = $this->updatedStartYear($data['start_year']);
-            // 
+                'phone' => $this->phone,
+                'email' => $this->email,
+                'address' => $this->address,
 
-            // 3.7 Création de l’arbitre
-            $referee = Referee::create([
-                'league_id' => $data['league_id'],
-                'referee_role_id' => $data['referee_role_id'],
-                'person_id' => $personId,
-                'last_name' => $data['last_name'],
-                'first_name' => $data['first_name'],
-                'date_of_birth' => $data['date_of_birth'],
-                'gender' => $data['gender'],
-                'phone' => $data['phone'],
-                'email' => $data['email'],
-                'address' => $data['address'],
-                'education_level' => $data['education_level'],
-                'profession' => $data['profession'],
-                'start_year' => $startYear,
-                'category' => $data['category'],
-                'profile_photo_path' => $photoPath,
+                'league_id' => $this->league_id,
+                'category' => $this->category,
+                'start_year' => $this->start_year,
+                'referee_role_id' => $this->referee_role_id,
             ]);
 
-            // 3.8 Création du document d’identité lié
+            // b) Gestion de la photo (si nouvelle)
+            if ($this->profile_photo) {
+                $path = $this->profile_photo->store('referees', 'public');
+                $this->referee->profile_photo_path = $path;
+            }
+
+            $this->referee->save();
+
+            // c) Document d’identité
             if ($this->identity_type) {
                 $payload = [
                     'type' => $this->identity_type,
@@ -174,20 +216,21 @@ new class extends Component {
                 ];
 
                 // updateOrCreate sur la relation hasOne
-                $referee->identityDocument()
+                $this->referee->identityDocument()
                     ->updateOrCreate(
-                        ['referee_id' => $referee->id],
+                        ['referee_id' => $this->referee->id],
                         $payload
                     );
             } else {
                 // Si aucun type sélectionné, on supprime le document éventuel
-                $referee->identityDocument()->delete();
+                $this->referee->identityDocument()->delete();
             }
         });
 
-        // Petit flash + redirection vers la liste
-        session()->flash('status', __('Referee created successfully.'));
+        // ----- 3. Feedback et redirection -----
+        session()->flash('status', __('Referee updated successfully.'));
 
+        // Redirection vers la liste (adapter le nom de route si besoin)
         $this->redirectRoute('admin.referees.index');
     }
 
@@ -216,8 +259,6 @@ new class extends Component {
         // Final ID : LIFKIN-000123, etc.
         return "{$league->code}-{$formattedNumber}";
     }
-
-
 }
 
 ?>
@@ -438,7 +479,7 @@ new class extends Component {
             {{-- Bouton Enregistrer --}}
             <flux:button
                 class="text-white font-medium border rounded-3xl text-sm px-4 py-3 focus:outline-none cursor-pointer"
-                wire:click="save" wire:loading.attr="disabled">
+                wire:click="update" wire:loading.attr="disabled">
                 <span wire:loading.remove>{{ __('Save') }}</span>
                 <span wire:loading>{{ __('Saving...') }}</span>
             </flux:button>
