@@ -30,7 +30,7 @@ Route::middleware(['auth', 'permission:admin_access', 'must_set_password'])
             ->name('referees.edit')
             ->whereNumber('referee');
 });
- 
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
