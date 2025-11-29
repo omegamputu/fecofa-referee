@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\League;
 use App\Models\Referees\RefereeRole;
 use App\Models\Referees\Referee;
-use App\Models\Referees\IdentityDocument;
+use App\Models\Referees\RefereeCategory;
 use Livewire\WithFileUploads;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
@@ -32,8 +32,8 @@ new class extends Component {
 
     public ?int $league_id = null;
     public ?int $start_year = null;
-    public ?string $category = null;
-    public ?int $referee_role_id = null;
+    public ?int $referee_category_id = null; // Category of the referee
+    public ?int $referee_role_id = null; // Function of the referee
 
     // Upload photo
     public $profile_photo = null;
@@ -44,6 +44,7 @@ new class extends Component {
     {
         return [
             'leagues' => League::select('id', 'code', 'name')->orderBy('code')->get()->toArray(),
+            'categories' => RefereeCategory::select('id', 'name')->orderBy('id')->get()->toArray(),
             'roles' => RefereeRole::select('id', 'name')->orderBy('name')->get()->toArray(),
         ];
     }
@@ -120,7 +121,7 @@ new class extends Component {
 
             'league_id' => ['required', 'exists:leagues,id'],
             'start_year' => ['nullable', 'integer', 'min:1980', 'max:' . date('Y')],
-            'category' => ['required', Rule::in(['internationale', 'nationale', 'SN', 'stagiaire', 'UNE'])],
+            'referee_category_id' => ['required', 'exists:referee_categories,id'],
             'referee_role_id' => ['required', 'exists:referee_roles,id'],
 
             'profile_photo' => ['nullable', 'image', 'max:2048'], // 2 Mo
@@ -150,7 +151,7 @@ new class extends Component {
             }
 
             // 3.6 Upload de la photo éventuelle
-            //$photoPath = $this->updatedProfilePhoto();
+            $photoPath = null;
             if ($this->profile_photo) {
                 $photoPath = $this->uploadProfilePhoto();
             }
@@ -173,7 +174,7 @@ new class extends Component {
                 'education_level' => $data['education_level'],
                 'profession' => $data['profession'],
                 'start_year' => $startYear,
-                'category' => $data['category'],
+                'referee_category_id' => $data['referee_category_id'],
                 'profile_photo_path' => $photoPath,
             ]);
 
@@ -368,7 +369,6 @@ new class extends Component {
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>
@@ -403,23 +403,14 @@ new class extends Component {
                     <flux:input type="number" wire:model.defer="start_year" label="{{ __('Start year') }}" min="1980"
                         placeholder="Ex: 2008" class="mb-2" />
 
-                    <flux:select label="{{ __('Category') }}" wire:model.defer="category" class="mb-2" required>
+                    <flux:select label="{{ __('Category') }}" wire:model.defer="referee_category_id" class="mb-2"
+                        required>
                         <flux:select.option value="">{{ __('Select category') }}</flux:select.option>
-                        <flux:select.option value="internationale">
-                            {{ __("International") }}
-                        </flux:select.option>
-                        <flux:select.option value="nationale">
-                            {{ __("National") }}
-                        </flux:select.option>
-                        <flux:select.option value="SN">
-                            {{ __("SN") }}
-                        </flux:select.option>
-                        <flux:select.option value="stagiaire">
-                            {{ __("Intern") }}
-                        </flux:select.option>
-                        <flux:select.option value="UNE">
-                            {{ __("UNE") }}
-                        </flux:select.option>
+                        @foreach ($categories as $category)
+                            <flux:select.option value="{{ $category['id'] }}">
+                                {{ $category['name'] }}
+                            </flux:select.option>
+                        @endforeach
                     </flux:select>
 
                     <flux:select label="{{ __('Function') }}" wire:model.defer="referee_role_id" required>

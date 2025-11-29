@@ -226,7 +226,7 @@
 
                         {{-- Catégorie --}}
                         <td class="center small">
-                            {{ ucfirst($ref->category ?? '') }}
+                            {{ ucfirst($ref->refereeCategory?->name ?? '') }}
                         </td>
 
                         {{-- Rôle --}}
