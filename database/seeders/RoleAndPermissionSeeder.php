@@ -64,6 +64,7 @@ class RoleAndPermissionSeeder extends Seeder
 
             // Permission "chapeau"
             'manage_referees', // => donne accès global à la gestion des arbitres
+            'referee_access', // => accès aux écrans arbitres
         ];
 
         foreach ($permissions as $name) {
@@ -96,6 +97,7 @@ class RoleAndPermissionSeeder extends Seeder
             'manage_matches',
             'manage_seasons',
             'manage_referees',  // accès complet aux arbitres
+            'referee_access',  // accès aux écrans arbitres
             'admin_access',
         ]);
 
@@ -128,6 +130,7 @@ class RoleAndPermissionSeeder extends Seeder
             'view_evaluation',
             'generate_reports',
             'export_internal_list',
+            'referee_access',
         ]);
 
         // --- OWNER = tous les droits ---

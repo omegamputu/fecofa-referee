@@ -4,6 +4,7 @@ use App\Livewire\Auth\InviteSetPassword;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
+use App\Http\Controllers\Referee\ExportController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -29,6 +30,20 @@ Route::middleware(['auth', 'permission:admin_access', 'must_set_password'])
         Volt::route('/referees/{referee}/edit', 'admin.referees.edit')
             ->name('referees.edit')
             ->whereNumber('referee');
+});
+
+Route::get('/referees/export', [ExportController::class, 'pdf'])
+    ->name('referees.export')
+    ->middleware(['auth', 'permission:referee_access', 'must_set_password']);
+
+Route::middleware(['auth', 'permission:referee_access', 'must_set_password'])
+    ->prefix('referee')->name('referee')->as('referee.')
+    ->group(function () {
+        Volt::route('/dashboard', 'referee.dashboard')->name('dashboard');
+        Volt::route('/matches', 'referee.matches.index')->name('matches.index');
+        Volt::route('/matches/{match}', 'referee.matches.show')
+            ->name('matches.show')
+            ->whereNumber('match');
 });
 
 Route::middleware(['auth'])->group(function () {
