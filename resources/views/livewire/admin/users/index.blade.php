@@ -177,7 +177,7 @@ new class extends Component {
 
 ?>
 
-<section class="container mx-auto w-full max-w-7xl bg-white py-6 px-6 rounded-3xl">
+<section class="container mx-auto w-full max-w-7xl bg-white dark:bg-neutral-900 py-6 px-6 rounded-3xl">
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
 
@@ -204,7 +204,7 @@ new class extends Component {
 
         <div>
             <flux:modal.trigger name="create-user">
-                <flux:button variant="primary" class="cursor-pointer" wire:navigate>
+                <flux:button variant="primary" color="green" class="cursor-pointer" wire:navigate>
                     {{ __("Add user") }}
                 </flux:button>
             </flux:modal.trigger>
@@ -239,7 +239,7 @@ new class extends Component {
     </div>
 
     <table
-        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 bg-white py-6 px-6 rounded-xl">
+        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 bg-white dark:bg-[#0E1526] py-6 px-6 rounded-xl">
         <thead class="text-xs text-gray-700 dark:text-gray-400">
             <tr>
                 <th scope="col" class="px-6 py-3">
@@ -333,11 +333,11 @@ new class extends Component {
                                 <flux:separator text="or" />
 
                                 <div class="text-sm text-zinc-500 dark:text-zinc-300">
-                                    <span class="font-semibold mb-3"> {{ __("Invitation Sent") }} </span> :
+                                    <span class="font-semibold mb-3"> {{ __("Invitation sent") }} </span> :
                                     {{ $u->invitation_sent_count ?? 0 }} </br>
 
                                     @if($u->invited_at)
-                                        <span class="font-semibold">{{ __("Last Sent") }}</span> :
+                                        <span class="font-semibold">{{ __("Last sent") }}</span> :
                                         {{ optional($u->invited_at)->format('d/m/Y H:i') }}
                                     @endif
                                 </div>
@@ -431,8 +431,9 @@ new class extends Component {
                             <div class="space-y-6">
                                 <div>
                                     <flux:heading size="lg">{{ __("Delete user") }}</flux:heading>
-                                    <flux:text class="mt-2">{{ __("Are you sure you want to delete this user? This action cannot be
-                                                            undone.") }}</flux:text>
+                                    <flux:text class="mt-2">
+                                        {{ __("Are you sure you want to delete this user? This action cannot be undone.") }}
+                                    </flux:text>
                                 </div>
 
                                 <div class="flex gap-2">

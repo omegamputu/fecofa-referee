@@ -145,7 +145,7 @@ new class extends Component {
     </div>
 
     <table
-        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-slate-400 bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-700 py-6 px-6 rounded-xl">
+        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-slate-400 bg-white dark:bg-[#0E1526] py-6 px-6 rounded-xl">
         <thead class="text-xs text-gray-700 dark:text-slate-400">
             <tr>
                 <th class="px-4 py-3">{{ __('Person ID') }}</th>

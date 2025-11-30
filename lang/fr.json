@@ -407,5 +407,9 @@
     "Are you sure you want to delete this league? This action cannot be undone.": "Êtes-vous sûr de vouloir supprimer cette ligue ? Cette action ne peut pas être annulée.",
     "Search by name, category or code": "Rechercher par nom, catégorie ou code",
     "Printed at": "Imprimé le",
-    "Refereeing": "Arbitrage"
+    "Refereeing": "Arbitrage",
+    "Invitation sent": "Invitation envoyée",
+    "Last sent": "Dernier envoi",
+    "Activate": "Activer",
+    "Deactivate": "Désactiver"
 }

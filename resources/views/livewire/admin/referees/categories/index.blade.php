@@ -128,7 +128,7 @@ new class extends Component {
 }
 ?>
 
-<section class="container mx-auto w-full max-w-7xl bg-white dark:bg-[#0E1526] dark:rounded-xl py-6 px-6 rounded-3xl">
+<section class="container mx-auto w-full max-w-7xl bg-white dark:bg-neutral-900 dark:rounded-xl py-6 px-6 rounded-3xl">
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
 
@@ -161,7 +161,7 @@ new class extends Component {
 
     {{-- Tableau --}}
     <table
-        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-700 py-6 px-6 rounded-xl">
+        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 bg-white dark:bg-[#0E1526] dark:border-neutral-700 py-6 px-6 rounded-xl">
         <thead class="text-xs text-gray-700 dark:text-gray-400">
             <tr>
                 <th scope="col" class="px-6 py-3">{{ __("ID") }}</th>
