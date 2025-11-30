@@ -145,8 +145,8 @@ new class extends Component {
     </div>
 
     <table
-        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 bg-white py-6 px-6 rounded-xl">
-        <thead class="text-xs text-gray-700 dark:text-gray-400">
+        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-slate-400 bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-700 py-6 px-6 rounded-xl">
+        <thead class="text-xs text-gray-700 dark:text-slate-400">
             <tr>
                 <th class="px-4 py-3">{{ __('Person ID') }}</th>
                 <th class="px-4 py-3">{{ __('Full name') }}</th>
@@ -160,7 +160,7 @@ new class extends Component {
         </thead>
         <tbody>
             @forelse($referees as $referee)
-                <tr>
+                <tr class="dark:text-slate-400">
                     <td class="px-4 py-3">
                         {{ $referee->person_id }}
                     </td>
@@ -200,7 +200,8 @@ new class extends Component {
                     {{-- Status --}}
                     <td class="px-4 py-3">
                         @if ($referee->is_active)
-                            <flux:badge color="green" size="sm">{{ __("Active") }}</flux:badge>
+                            <flux:badge color="green" size="sm" class="dark:text-white dark:bg-green-500">{{ __("Active") }}
+                            </flux:badge>
                         @else
                             <flux:badge color="red" size="sm">{{ __("Inactive") }}</flux:badge>
                         @endif
@@ -223,7 +224,8 @@ new class extends Component {
 
                     {{-- Actions --}}
                     <td class="px-4 py-3 text-center">
-                        <flux:button size="xs" variant="ghost" class="cursor-pointer"
+                        <flux:button size="xs" variant="ghost"
+                            class="cursor-pointer dark:bg-[#0E1526] dark:text-white hover:dark:bg-[#0080C0]"
                             :href="route('admin.referees.edit', $referee)" wire:navigate>
                             {{ __('Edit') }}
                         </flux:button>

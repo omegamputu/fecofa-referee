@@ -289,16 +289,16 @@ new class extends Component {
 
         <!-- Title -->
         <header class="mb-6">
-            <h1 class="text-3xl font-semibold text-neutral-900">{{ __("Update referee") }}</h1>
+            <h1 class="text-3xl font-semibold text-neutral-900 dark:text-neutral-400">{{ __("Update referee") }}</h1>
             <p class="mt-1 text-sm text-neutral-500">
                 {{ __("Fill in the referee personal details, league and function.") }}
             </p>
         </header>
 
-        <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="grid grid-cols-3 gap-4 mb-6 dark:text-gray-700">
             <div class="flex flex-col col-span-2 gap-4 mb-6">
-                <div class="bg-white w-full p-6 rounded-xl">
-                    <h2 class="text-xl font-semibold mb-4">
+                <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-700 w-full p-6 rounded-xl">
+                    <h2 class="text-xl font-semibold mb-4 dark:text-slate-400">
                         {{ __("Referee Information") }}
                     </h2>
 
@@ -368,8 +368,8 @@ new class extends Component {
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl">
-                    <h2 class="text-xl font-semibold mb-4">
+                <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-700 p-6 rounded-xl">
+                    <h2 class="text-xl font-semibold mb-4 dark:text-slate-400">
                         {{ __("Contact details") }}
                     </h2>
 
@@ -386,8 +386,8 @@ new class extends Component {
                     </div>
                 </div>
 
-                <div class="bg-white w-full p-6 rounded-xl">
-                    <h2 class="text-xl font-semibold mb-4">
+                <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-700 w-full p-6 rounded-xl">
+                    <h2 class="text-xl font-semibold mb-4 dark:text-slate-400">
                         {{ __("Identity Document") }}
                     </h2>
 
@@ -423,8 +423,8 @@ new class extends Component {
             </div>
 
             <div class="flex flex-col gap-4">
-                <div class="bg-white p-6 rounded-xl">
-                    <h2 class="text-xl font-semibold mb-4">
+                <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-700 p-6 rounded-xl">
+                    <h2 class="text-xl font-semibold mb-4 dark:text-slate-400">
                         {{ __("Affiliated league") }}
                     </h2>
                     <div>
@@ -442,8 +442,8 @@ new class extends Component {
                         @enderror
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-xl">
-                    <h2 class="text-xl font-semibold mb-4">
+                <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-700 p-6 rounded-xl">
+                    <h2 class="text-xl font-semibold mb-4 dark:text-slate-400">
                         {{ __("Refereeing career") }}
                     </h2>
 
@@ -479,7 +479,7 @@ new class extends Component {
         toggleFooter();
         window.addEventListener('scroll', toggleFooter);
     " x-show="show" x-transition.opacity.duration.200ms
-        class="fixed bottom-0 left-0 right-0 z-40 bg-neutral-900 pointer-events-none">
+        class="fixed bottom-0 left-0 right-0 z-40 bg-neutral-900 dark:bg-[#0080C0] pointer-events-none">
         <div class="pointer-events-auto mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
             {{-- Texte optionnel --}}
             <span class="hidden sm:inline text-sm text-neutral-300">
@@ -487,8 +487,7 @@ new class extends Component {
             </span>
 
             {{-- Bouton Enregistrer --}}
-            <flux:button
-                class="text-white font-medium border rounded-3xl text-sm px-4 py-3 focus:outline-none cursor-pointer"
+            <flux:button class="text-white font-medium rounded-3xl text-sm px-4 py-3 focus:outline-none cursor-pointer"
                 wire:click="update" wire:loading.attr="disabled">
                 <span wire:loading.remove>{{ __('Save') }}</span>
                 <span wire:loading>{{ __('Saving...') }}</span>
