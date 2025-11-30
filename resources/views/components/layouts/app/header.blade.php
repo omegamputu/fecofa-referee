@@ -7,7 +7,7 @@
 
 <body class="min-h-screen bg-neutral-200 dark:bg-neutral-900">
     <flux:header container
-        class="bg-neutral-800 border-b border-neutral-800 text-neutral-50 dark:bg-neutral-900 dark:border-neutral-900">
+        class="bg-neutral-800 border-b border-neutral-800 text-neutral-50 dark:bg-[#0080C0] dark:border-neutral-900">
         <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
         <div class="flex items-center space-x-2 me-5">
