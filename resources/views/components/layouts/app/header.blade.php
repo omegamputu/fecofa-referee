@@ -21,26 +21,44 @@
         @endphp
 
         <flux:navbar class="-mb-px max-lg:hidden">
-            <flux:navbar.item icon="layout-grid" :href="route('admin.dashboard')"
-                :current="request()->routeIs('admin.dashboard')" wire:navigate
-                class="{{ $baseLink }} {{ request()->routeIs('admin.dashboard') ? '!text-white !font-semibold' : '' }}">
+            @hasanyrole('Owner|Administrator')
+            @can('admin_access')
+                <flux:navbar.item icon="layout-grid" :href="route('admin.dashboard')"
+                    :current="request()->routeIs('admin.dashboard')" wire:navigate
+                    class="{{ $baseLink }} {{ request()->routeIs('admin.dashboard') ? '!text-white !font-semibold' : '' }}">
+                    {{ __('Dashboard') }}
+                </flux:navbar.item>
+            @endcan
+
+            @can('view_referee')
+                <flux:navbar.item icon="queue-list" :href="route('referees.index')"
+                    :current="request()->routeIs('referees.index')" wire:navigate
+                    class="{{ $baseLink }} {{ request()->routeIs('referees.index') ? '!text-white !font-semibold' : '' }}">
+                    {{ __('Referees') }}
+                </flux:navbar.item>
+            @endcan
+
+            @can('manage_referee_categories')
+                <flux:navbar.item icon="academic-cap" :href="route('referees.categories.index')"
+                    :current="request()->routeIs('referees.categories.index')" wire:navigate
+                    class="{{ $baseLink }} {{ request()->routeIs('referees.categories.index') ? '!text-white !font-semibold' : '' }}">
+                    {{ __('Categories') }}
+                </flux:navbar.item>
+            @endcan
+            @endhasanyrole
+
+            @hasanyrole('Member|Viewer')
+            <flux:navbar.item icon="layout-grid" :href="route('dashboard')" :current="request()->routeIs('dashboard')"
+                wire:navigate
+                class="{{ $baseLink }} {{ request()->routeIs('dashboard') ? '!text-white !font-semibold' : '' }}">
                 {{ __('Dashboard') }}
             </flux:navbar.item>
-            <flux:navbar.item icon="queue-list" :href="route('admin.referees.index')"
-                :current="request()->routeIs('admin.referees.index')" wire:navigate
-                class="{{ $baseLink }} {{ request()->routeIs('admin.referees.index') ? '!text-white !font-semibold' : '' }}">
-                {{ __('Referees') }}
-            </flux:navbar.item>
-            <flux:navbar.item icon="academic-cap" :href="route('admin.referees.categories.index')"
-                :current="request()->routeIs('admin.referees.categories.index')" wire:navigate
-                class="{{ $baseLink }} {{ request()->routeIs('admin.referees.categories.index') ? '!text-white !font-semibold' : '' }}">
-                {{ __('Categories') }}
-            </flux:navbar.item>
+            @endhasanyrole
         </flux:navbar>
 
         <flux:spacer />
 
-        <flux:navbar class="me-1.5 space-x-0.5 rtl:space-x-reverse py-0!">
+        <flux:navbar class=" me-1.5 space-x-0.5 rtl:space-x-reverse py-0!">
             <flux:tooltip :content="__('Notifications')" position="bottom">
                 <flux:navbar.item class="h-10 max-lg:hidden [&>div>svg]:size-5" icon="bell" href="#" target="_blank"
                     label="Notifications"
@@ -75,12 +93,19 @@
                 <flux:menu.separator />
 
                 <flux:menu.radio.group>
-                    <flux:menu.item icon="users" :href="route('admin.users.index')" wire:navigate>
-                        {{ __('Manage users') }}
-                    </flux:menu.item>
-                    <flux:menu.item icon="building-office" :href="route('admin.leagues.index')" wire:navigate>
-                        {{ __('Manage leagues') }}
-                    </flux:menu.item>
+                    @hasanyrole('Owner|Administrator')
+                    @can('manage_users')
+                        <flux:menu.item icon="users" :href="route('admin.users.index')" wire:navigate>
+                            {{ __('Manage users') }}
+                        </flux:menu.item>
+                    @endcan
+
+                    @can('manage_leagues')
+                        <flux:menu.item icon="building-office" :href="route('admin.leagues.index')" wire:navigate>
+                            {{ __('Manage leagues') }}
+                        </flux:menu.item>
+                    @endcan
+                    @endhasanyrole
                     <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}
                     </flux:menu.item>
                 </flux:menu.radio.group>

@@ -45,6 +45,6 @@ class ExportController extends Controller
             ])
             ->setPaper('a4', 'portrait'); // ou 'landscape'
 
-        return $pdf->download('referees_fecofa_' . $generatedAt->format('Ymd_His') . '.pdf');
+        return $pdf->download('refereeing_fecofa_list' . $generatedAt->format('Ymd_His') . '.pdf');
     }
 }

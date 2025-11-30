@@ -33,29 +33,35 @@ Route::middleware(['auth', 'permission:admin_access', 'must_set_password'])
         //Volt::route('permissions', 'admin.permissions')->name('permissions.index');
         Volt::route('/users', 'admin.users.index')->name('users.index');
         Volt::route('/leagues', 'admin.leagues.index')->name('leagues.index');
+});
 
-        Volt::route('/referees/categories', 'admin.referees.categories.index')->name('referees.categories.index');
+////////////////////
+/// Referee routes
+Route::middleware(['auth','must_set_password'])
+    ->group(function () {
+        Volt::route('/referees/categories', 'referees.categories.index')
+            ->middleware(['permission:manage_referee_categories'])
+            ->name('referees.categories.index');
 
-        Volt::route('/referees', 'admin.referees.index')->name('referees.index');
-        Volt::route('/referees/create', 'admin.referees.create')->name('referees.create');
-        Volt::route('/referees/{referee}/edit', 'admin.referees.edit')
+        Volt::route('/referees', 'referees.index')
+            ->middleware(['permission:view_referee'])
+            ->name('referees.index');
+
+        Volt::route('/referees/create', 'referees.create')
+            ->middleware(['permission:create_referee'])
+            ->name('referees.create');
+
+        Volt::route('/referees/{referee}/edit', 'referees.edit')
+            ->middleware(['permission:edit_referee'])
             ->name('referees.edit')
             ->whereNumber('referee');
+
+        Route::get('/referees/export', [ExportController::class, 'pdf'])
+            ->name('referees.export')
+            ->middleware(['auth', 'permission:export_referee_data']);
 });
 
-Route::get('/referees/export', [ExportController::class, 'pdf'])
-    ->name('referees.export')
-    ->middleware(['auth', 'permission:referee_access', 'must_set_password']);
-
-Route::middleware(['auth', 'permission:referee_access', 'must_set_password'])
-    ->prefix('referee')->name('referee')->as('referee.')
-    ->group(function () {
-        Volt::route('/dashboard', 'referee.dashboard')->name('dashboard');
-        Volt::route('/matches', 'referee.matches.index')->name('matches.index');
-        Volt::route('/matches/{match}', 'referee.matches.show')
-            ->name('matches.show')
-            ->whereNumber('match');
-});
+////////////////////
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');

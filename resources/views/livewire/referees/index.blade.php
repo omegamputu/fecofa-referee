@@ -130,18 +130,23 @@ new class extends Component {
             </flux:select>
         </div>
 
-        <flux:button variant="primary" color="green" class="shrink-0 cursor-pointer"
-            :href="route('admin.referees.create')" wire:navigate>
-            {{ __('Add referee') }}
-        </flux:button>
+        @can('create_referee')
+            <flux:button variant="primary" color="green" class="shrink-0 cursor-pointer" :href="route('referees.create')"
+                wire:navigate>
+                {{ __('Add referee') }}
+            </flux:button>
+        @endcan
 
-        <a href="{{ route('referees.export', [
-    'search' => $search ?? null,
-    'league' => $leagueFilter ?? null,
-    'role' => $roleFilter ?? null,
-]) }}" class="inline-flex items-center rounded-lg bg-white border px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
-            {{ __("Export PDF") }}
-        </a>
+        @can('export_referee_data')
+                <a href="{{ route('referees.export', [
+                'search' => $search ?? null,
+                'league' => $leagueFilter ?? null,
+                'role' => $roleFilter ?? null,
+            ]) }}"
+                    class="inline-flex items-center rounded-lg bg-white border px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
+                    {{ __("Export PDF") }}
+                </a>
+        @endcan
     </div>
 
     <table
@@ -224,11 +229,13 @@ new class extends Component {
 
                     {{-- Actions --}}
                     <td class="px-4 py-3 text-center">
-                        <flux:button size="xs" variant="ghost"
-                            class="cursor-pointer dark:bg-[#0E1526] dark:text-white hover:dark:bg-[#0080C0]"
-                            :href="route('admin.referees.edit', $referee)" wire:navigate>
-                            {{ __('Edit') }}
-                        </flux:button>
+                        @can('edit_referee')
+                            <flux:button size="xs" variant="ghost"
+                                class="cursor-pointer dark:bg-[#0E1526] dark:text-white hover:dark:bg-[#0080C0]"
+                                :href="route('referees.edit', $referee)" wire:navigate>
+                                {{ __('Edit') }}
+                            </flux:button>
+                        @endcan
                     </td>
                 </tr>
             @empty
