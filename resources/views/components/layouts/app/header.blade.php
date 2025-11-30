@@ -13,7 +13,7 @@
         <div class="flex items-center space-x-2 me-5">
             <span class="text-xl font-extrabold tracking-wide">FECOFA</span>
             <span class="text-gray-400">|</span>
-            <span class="text-lg text-gray-300">Arbitrage</span>
+            <span class="text-lg text-gray-300">{{ __("Refereeing") }}</span>
         </div>
 
         @php
@@ -41,10 +41,6 @@
         <flux:spacer />
 
         <flux:navbar class="me-1.5 space-x-0.5 rtl:space-x-reverse py-0!">
-            <flux:navbar.item href="#"
-                class="{{ $baseLink }} {{ request()->routeIs('admin.leagues.index') ? '!text-white !font-semibold' : '' }}">
-                {{ __('Désignation comme arbitre officiel 2026') }}
-            </flux:navbar.item>
             <flux:tooltip :content="__('Notifications')" position="bottom">
                 <flux:navbar.item class="h-10 max-lg:hidden [&>div>svg]:size-5" icon="bell" href="#" target="_blank"
                     label="Notifications"
