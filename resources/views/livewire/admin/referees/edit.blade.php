@@ -289,7 +289,7 @@ new class extends Component {
 
         <!-- Title -->
         <header class="mb-6">
-            <h1 class="text-3xl font-semibold text-neutral-900">{{ __("Add referee") }}</h1>
+            <h1 class="text-3xl font-semibold text-neutral-900">{{ __("Update referee") }}</h1>
             <p class="mt-1 text-sm text-neutral-500">
                 {{ __("Fill in the referee personal details, league and function.") }}
             </p>
@@ -299,7 +299,7 @@ new class extends Component {
             <div class="flex flex-col col-span-2 gap-4 mb-6">
                 <div class="bg-white w-full p-6 rounded-xl">
                     <h2 class="text-xl font-semibold mb-4">
-                        {{ __("Personal information") }}
+                        {{ __("Referee Information") }}
                     </h2>
 
                     <div class="flex flex-row gap-2">
@@ -323,7 +323,7 @@ new class extends Component {
                             </div>
 
                             <div class="flex flex-row gap-4 mb-0">
-                                <flux:input type="text" label="{{ __('Education Level') }}"
+                                <flux:input type="text" label="{{ __('Education level') }}"
                                     wire:model.defer="education_level" placeholder="Ex: L2, G3, DEA, D6" class="mb-2" />
 
                                 <flux:input type="text" label="{{ __('Profession') }}" wire:model.defer="profession"
@@ -375,13 +375,13 @@ new class extends Component {
 
                     <div class="flex flex-col gap-2">
                         <div class="flex flex-row gap-4 mb-4">
-                            <flux:input type="tel" wire:model.defer="phone" label="{{ __('Phone Number') }}"
+                            <flux:input type="tel" wire:model.defer="phone" label="{{ __('Phone number') }}"
                                 placeholder="Ex: +243000000000" />
                             <flux:input type="email" wire:model.defer="email" label="{{ __('E-mail Address') }}"
                                 placeholder="Ex: johndoe@example.com" />
                         </div>
                         <div class="block w-117">
-                            <flux:textarea wire:model.defer="address" rows="4" label="{{ __('Home Adress') }}" />
+                            <flux:textarea wire:model.defer="address" rows="4" label="{{ __('Home address') }}" />
                         </div>
                     </div>
                 </div>
@@ -425,7 +425,7 @@ new class extends Component {
             <div class="flex flex-col gap-4">
                 <div class="bg-white p-6 rounded-xl">
                     <h2 class="text-xl font-semibold mb-4">
-                        {{ __("League Affiliation") }}
+                        {{ __("Affiliated league") }}
                     </h2>
                     <div>
                         <flux:select wire:model.defer="league_id" class="mb-4" required>

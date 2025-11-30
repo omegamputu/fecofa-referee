@@ -210,14 +210,17 @@ new class extends Component {
             <flux:modal name="create-user" class="md:w-96" variant="flyout">
                 <div class="space-y-6">
                     <div>
-                        <flux:heading size="lg">Create user</flux:heading>
-                        <flux:text class="mt-2">Decribe personal details.</flux:text>
+                        <flux:heading size="lg">{{ __("Create user") }}</flux:heading>
+                        <flux:text class="mt-2">{{ __("Decribe personal details.") }}</flux:text>
                     </div>
 
-                    <flux:input label="Name" wire:model.defer="name" type="text" placeholder="Your name" required />
-                    <flux:input label="Email" wire:model.defer="email" type="email" placeholder="Your email" required />
+                    <flux:input label="{{ __('Name') }}" wire:model.defer="name" type="text"
+                        placeholder="{{ __('Your name') }}" required />
+                    <flux:input label="{{ __('Email') }}" wire:model.defer="email" type="email"
+                        placeholder="{{ __('Your email') }}" required />
 
-                    <flux:select wire:model="role" label="Role" placeholder="Select role" required>
+                    <flux:select wire:model="role" label="{{ __('Role') }}" placeholder="{{ __('Select role') }}"
+                        required>
                         @foreach ($roles as $role)
                             <flux:select.option class="text-zinc-400" value="{{ $role }}">{{ ucfirst($role) }}
                             </flux:select.option>
@@ -294,15 +297,16 @@ new class extends Component {
                             variant="flyout">
                             <div class="space-y-6">
                                 <div>
-                                    <flux:heading size="lg">Edit user</flux:heading>
-                                    <flux:text class="mt-2">Update personal details.</flux:text>
+                                    <flux:heading size="lg">{{ __("Edit user") }}</flux:heading>
+                                    <flux:text class="mt-2">{{ __("Update personal details.") }}</flux:text>
                                 </div>
 
-                                <flux:input label="Name" wire:model.defer="editName" type="text" placeholder="Your name" />
-                                <flux:input label="Email" wire:model.defer="editEmail" type="email"
+                                <flux:input label="{{ __('Name') }}" wire:model.defer="editName" type="text"
+                                    placeholder="Your name" />
+                                <flux:input label="{{ __('Email') }}" wire:model.defer="editEmail" type="email"
                                     placeholder="Your email" />
 
-                                <flux:select wire:model="selectedRole" label="Role" placeholder="Select role">
+                                <flux:select wire:model="selectedRole" label="Role" placeholder="{{ __('Select role') }}">
                                     @foreach ($roles as $role)
                                         <flux:select.option class="text-zinc-400" value="{{ $role }}">{{ ucfirst($role) }}
                                         </flux:select.option>
@@ -348,8 +352,9 @@ new class extends Component {
                         <flux:modal name="resent-invitation-user-{{ $u->id }}" class="md:w-96">
                             <div class="space-y-6">
                                 <div>
-                                    <flux:heading size="lg">Resend Invitation</flux:heading>
-                                    <flux:text class="mt-2">Are you sure you want to resend the invitation to this user?
+                                    <flux:heading size="lg">{{ __("Resend Invitation") }}</flux:heading>
+                                    <flux:text class="mt-2">
+                                        {{ __("Are you sure you want to resend the invitation to this user?") }}
                                     </flux:text>
                                 </div>
 
@@ -423,9 +428,9 @@ new class extends Component {
                         <flux:modal name="delete-user-{{ $u->id }}" class="md:w-96">
                             <div class="space-y-6">
                                 <div>
-                                    <flux:heading size="lg">Delete user</flux:heading>
-                                    <flux:text class="mt-2">Are you sure you want to delete this user? This action cannot be
-                                        undone.</flux:text>
+                                    <flux:heading size="lg">{{ __("Delete user") }}</flux:heading>
+                                    <flux:text class="mt-2">{{ __("Are you sure you want to delete this user? This action cannot be
+                                            undone.") }}</flux:text>
                                 </div>
 
                                 <div class="flex gap-2">

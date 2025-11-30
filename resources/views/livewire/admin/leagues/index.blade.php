@@ -231,13 +231,14 @@ new class extends Component {
     <flux:modal name="create-league" class="md:w-96" variant="flyout">
         <div class="space-y-4">
             <flux:heading size="lg">{{ __("Create league") }}</flux:heading>
+            <flux:text>{{ __("Decribe league details.") }}</flux:text>
 
-            <flux:input label="Name" wire:model.defer="name" />
+            <flux:input label="{{ __('Name') }}" wire:model.defer="name" />
             <flux:input label="Code" wire:model.defer="code" />
             <flux:input label="Province" wire:model.defer="province" />
-            <flux:input label="Headquarters" wire:model.defer="headquarters" />
-            <flux:input label="Contact email" wire:model.defer="contact_email" />
-            <flux:input label="Contact phone" wire:model.defer="contact_phone" />
+            <flux:input label="{{ __('Headquarters') }}" wire:model.defer="headquarters" />
+            <flux:input label="{{ __('Contact email') }}" wire:model.defer="contact_email" />
+            <flux:input label="{{ __('Contact phone') }}" wire:model.defer="contact_phone" />
 
             <flux:modal.close>
                 <flux:button wire:click="createLeague" class="w-full" variant="primary">
@@ -253,13 +254,14 @@ new class extends Component {
             variant="flyout">
             <div class="space-y-4">
                 <flux:heading size="lg">{{ __("Edit league") }}</flux:heading>
+                <flux:text>{{ __("Update league details.") }}</flux:text>
 
-                <flux:input label="Name" wire:model.defer="editName" />
+                <flux:input label="{{ __('Name') }}" wire:model.defer="editName" />
                 <flux:input label="Code" wire:model.defer="editCode" />
                 <flux:input label="Province" wire:model.defer="editProvince" />
-                <flux:input label="Headquarters" wire:model.defer="editHeadquarters" />
-                <flux:input label="Contact email" wire:model.defer="editContactEmail" />
-                <flux:input label="Contact phone" wire:model.defer="editContactPhone" />
+                <flux:input label="{{ __('Headquarters') }}" wire:model.defer="editHeadquarters" />
+                <flux:input label="{{ __('Contact email') }}" wire:model.defer="editContactEmail" />
+                <flux:input label="{{ __('Contact phone') }}" wire:model.defer="editContactPhone" />
 
                 <flux:modal.close>
                     <flux:button wire:click="updateLeague" class="w-full" variant="primary">
@@ -272,7 +274,8 @@ new class extends Component {
         <flux:modal name="delete-league-{{ $league->id }}" class="md:w-96">
             <div class="space-y-4">
                 <flux:heading size="lg">{{ __("Delete league") }}</flux:heading>
-                <flux:text>{{ __("Are you sure you want to delete this league?") }}</flux:text>
+                <flux:text>{{ __("Are you sure you want to delete this league? This action cannot be undone.") }}
+                </flux:text>
 
                 <div class="flex justify-end gap-2">
                     <flux:modal.close>

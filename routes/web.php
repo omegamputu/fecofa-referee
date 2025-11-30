@@ -10,6 +10,15 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+Route::get('/lang/{lang}', function ($lang) {
+    $availableLangs = ['fr', 'en'];
+
+    if (in_array($lang, $availableLangs)) {
+        session(['locale' => $lang]);
+    }
+    return redirect()->back();
+})->name('lang.switch');
+
 Volt::route('/invite/accept/{token}', InviteSetPassword::class)->name('invite.accept');
 
 Route::view('dashboard', 'dashboard')

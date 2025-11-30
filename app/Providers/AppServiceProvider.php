@@ -21,6 +21,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        app('router')->pushMiddlewareToGroup('web', \App\Http\Middleware\SetLocale::class);
+        
         // Le Super-Admin passe avant tous les checks
         Gate::before(function ($user, $ability) {
             return $user->hasRole('Owner') ? true : null;

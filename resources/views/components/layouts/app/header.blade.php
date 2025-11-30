@@ -50,6 +50,7 @@
                     label="Notifications"
                     class="{{ $baseLink }} {{ request()->routeIs('admin.leagues.index') ? '!text-white !font-semibold' : '' }}" />
             </flux:tooltip>
+            <livewire:language-switcher />
         </flux:navbar>
 
         <!-- Desktop User Menu -->

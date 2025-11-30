@@ -132,7 +132,7 @@ new class extends Component {
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
 
-    <h1 class="text-2xl font-semibold mb-4">{{ __("Referee categories") }}</h1>
+    <h1 class="text-2xl font-semibold mb-4">{{ __("Referee Categories") }}</h1>
 
     {{-- Search + bouton créer --}}
     <div class="flex items-center justify-between mb-4">
@@ -209,8 +209,8 @@ new class extends Component {
         <div class="space-y-4">
             <flux:heading size="lg">{{ __("Create category") }}</flux:heading>
 
-            <flux:input label="Name" wire:model.defer="name" />
-            <flux:textarea label="Description" wire:model.defer="description" />
+            <flux:input label="{{ __('Name') }}" wire:model.defer="name" />
+            <flux:textarea label="{{ __('Description') }}" wire:model.defer="description" />
 
             <flux:modal.close>
                 <flux:button wire:click="createCategory" class="w-full" variant="primary">
@@ -227,8 +227,8 @@ new class extends Component {
             <div class="space-y-4">
                 <flux:heading size="lg">{{ __("Edit category") }}</flux:heading>
 
-                <flux:input label="Name" wire:model.defer="editName" />
-                <flux:textarea label="Description" wire:model.defer="editDescription" />
+                <flux:input label="{{ __('Name') }}" wire:model.defer="editName" />
+                <flux:textarea label="{{ __('Description') }}" wire:model.defer="editDescription" />
 
                 <flux:modal.close>
                     <flux:button wire:click="updateCategory" class="w-full" variant="primary">

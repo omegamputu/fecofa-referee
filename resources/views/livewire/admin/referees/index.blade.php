@@ -140,7 +140,7 @@ new class extends Component {
     'league' => $leagueFilter ?? null,
     'role' => $roleFilter ?? null,
 ]) }}" class="inline-flex items-center rounded-lg bg-white border px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
-            Export PDF
+            {{ __("Export PDF") }}
         </a>
     </div>
 
