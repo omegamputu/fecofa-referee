@@ -147,11 +147,11 @@ new class extends Component {
 
 ?>
 
-<section class="container mx-auto w-full max-w-7xl bg-white py-6 px-6 rounded-3xl">
+<section class="container mx-auto w-full max-w-7xl bg-white dark:bg-neutral-900 py-6 px-6 rounded-3xl">
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
 
-    <h1 class="text-2xl font-semibold mb-4">{{ __("Leagues") }}</h1>
+    <h1 class="text-2xl font-semibold dark:text-neutral-400 mb-4">{{ __("Leagues") }}</h1>
 
     {{-- Search + bouton créer --}}
     <div class="flex items-center justify-between mb-4">
@@ -174,13 +174,13 @@ new class extends Component {
         </div>
 
         <flux:modal.trigger name="create-league">
-            <flux:button variant="primary" class="cursor-pointer">{{ __("Add league") }}</flux:button>
+            <flux:button variant="primary" color="green" class="cursor-pointer">{{ __("Add league") }}</flux:button>
         </flux:modal.trigger>
     </div>
 
     {{-- Tableau --}}
     <table
-        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 bg-white py-6 px-6 rounded-xl">
+        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 bg-white dark:bg-[#0E1526] py-6 px-6 rounded-xl">
         <thead class="text-xs text-gray-700 dark:text-gray-400">
             <tr>
                 <th scope="col" class="px-6 py-3">{{ __("Name") }}</th>

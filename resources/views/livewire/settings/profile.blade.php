@@ -69,7 +69,7 @@ new class extends Component {
     }
 }; ?>
 
-<section class="container mx-auto w-full max-w-7xl bg-white px-6 py-6 rounded-3xl">
+<section class="container mx-auto w-full max-w-7xl bg-white dark:bg-[#0E1526] px-6 py-6 rounded-3xl">
     @include('partials.settings-heading')
 
     <x-settings.layout :heading="__('Profile')" :subheading="__('Update your name and email address')">
