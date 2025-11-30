@@ -108,7 +108,9 @@ new class extends Component {
         $createUser($validated, $this->role);
 
         $this->reset(['name', 'email', 'role']);
-        session()->flash('message', __('User created and invitation sent.'));
+
+        session()->flash('status', __('User created and invitation sent.'));
+
         $this->resetPage();
     }
 
@@ -430,7 +432,7 @@ new class extends Component {
                                 <div>
                                     <flux:heading size="lg">{{ __("Delete user") }}</flux:heading>
                                     <flux:text class="mt-2">{{ __("Are you sure you want to delete this user? This action cannot be
-                                            undone.") }}</flux:text>
+                                                            undone.") }}</flux:text>
                                 </div>
 
                                 <div class="flex gap-2">

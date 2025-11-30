@@ -57,7 +57,7 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::registerView(fn () => view('livewire.auth.register'));
         // ➜ REMPLACER la vue Blade par TON composant Volt :
         Fortify::resetPasswordView(function (Request $request) {
-            return Volt::render('auth/invite-set-password', [
+            return Volt::mount('auth/invite-set-password', [
                 'token' => $request->route('token'),
                 'email' => $request->email,
             ]);
