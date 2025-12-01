@@ -411,5 +411,22 @@
     "Invitation sent": "Invitation envoyée",
     "Last sent": "Dernier envoi",
     "Activate": "Activer",
-    "Deactivate": "Désactiver"
+    "Deactivate": "Désactiver",
+    "Set your password": "Définir votre mot de passe",
+    "Enter your password below to log in": "Saisissez votre mot de passe ci-dessous pour vous connecter.",
+    "Added on": "Ajouté le",
+    "No referees have been registered yet.": "Aucun arbitre n'a encore été enregistré.",
+    "Latest registered referees": "Derniers arbitres enregistrés",
+    "Total referees": "Total des arbitres",
+    "International": "Internationaux",
+    "National": "Nationaux",
+    "New this month": "Nouveaux ce mois-ci",
+    "Overview of FECOFA refereeing.": "Vue d’ensemble de l’arbitrage FECOFA.",
+    "View all referees": "Voir tous les arbitres",
+    "Documents expiring soon": "Documents bientôt expirés",
+    "No documents are due to expire soon.": "Aucun document n’arrive à expiration bientôt.",
+    "Breakdown by category": "Répartition par catégorie",
+    "No data available at this time.": "Aucune donnée disponible pour le moment.",
+    "Number of referees": "Nombre d'arbitres",
+    "Breakdown by league": "Répartition par ligue"
 }

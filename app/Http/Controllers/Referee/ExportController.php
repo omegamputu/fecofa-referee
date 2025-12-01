@@ -39,12 +39,12 @@ class ExportController extends Controller
         
         $generatedAt = now();
         
-            $pdf = Pdf::loadView('referees.pdf_list', [
+            $pdf = Pdf::loadView('exports.pdf_list', [
                 'referees' => $referees,
                 'generatedAt' => $generatedAt,
             ])
             ->setPaper('a4', 'portrait'); // ou 'landscape'
 
-        return $pdf->download('referees_fecofa_' . $generatedAt->format('Ymd_His') . '.pdf');
+        return $pdf->download('fecofa_referees_list_' . $generatedAt->format('Ymd_His') . '.pdf');
     }
 }

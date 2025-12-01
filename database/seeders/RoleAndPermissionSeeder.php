@@ -42,7 +42,8 @@ class RoleAndPermissionSeeder extends Seeder
             'manage_seasons',
 
             // Import / export
-            'export_internal_list',
+            //'export_internal_list',
+            'export_referee_data',
             'import_referee_data',
 
             // Arbitres (granulaire)
@@ -61,6 +62,7 @@ class RoleAndPermissionSeeder extends Seeder
             'record_evaluation',
             'view_evaluation',
             'manage_trainings',
+            'manage_referee_categories',
 
             // Permission "chapeau"
             'manage_referees', // => donne accès global à la gestion des arbitres
@@ -91,14 +93,16 @@ class RoleAndPermissionSeeder extends Seeder
             'backup_database',
             'restore_database',
             'generate_reports',
-            'export_internal_list',
+            'export_referee_data',
             'import_referee_data',
             'manage_leagues',
             'manage_matches',
             'manage_seasons',
+            'manage_referee_categories', // accès aux catégories d'arbitres
             'manage_referees',  // accès complet aux arbitres
             'referee_access',  // accès aux écrans arbitres
             'admin_access',
+            'view_referee'
         ]);
 
         // --- MEMBER (Département arbitrage, CNA, etc.) ---
@@ -107,7 +111,7 @@ class RoleAndPermissionSeeder extends Seeder
             'view_referee',
             'create_referee',
             'edit_referee',
-            'delete_referee',
+            //'delete_referee',
 
             'assign_match',
             'edit_assignment',
@@ -119,7 +123,7 @@ class RoleAndPermissionSeeder extends Seeder
             'manage_trainings',
 
             'generate_reports',
-            'export_internal_list',
+            'export_referee_data',
             'import_referee_data',
         ]);
 
@@ -129,7 +133,7 @@ class RoleAndPermissionSeeder extends Seeder
             'view_assignment',
             'view_evaluation',
             'generate_reports',
-            'export_internal_list',
+            'export_referee_data',
             'referee_access',
         ]);
 

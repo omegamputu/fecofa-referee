@@ -177,7 +177,8 @@ new class extends Component {
     }
 } ?>
 
-<section class="container mx-auto w-full max-w-7xl bg-white dark:bg-[#0E1526] px-6 py-6 rounded-3xl">
+<section
+    class="container mx-auto w-full max-w-7xl bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-600 px-6 py-6 rounded-3xl">
     @include('partials.settings-heading')
 
     <x-settings.layout :heading="__('Two Factor Authentication')" :subheading="__('Manage your two-factor authentication settings')">
@@ -310,17 +311,17 @@ new class extends Component {
                     </div>
 
                     <div class="flex items-center space-x-2" x-data="{
-                                    copied: false,
-                                    async copy() {
-                                        try {
-                                            await navigator.clipboard.writeText('{{ $manualSetupKey }}');
-                                            this.copied = true;
-                                            setTimeout(() => this.copied = false, 1500);
-                                        } catch (e) {
-                                            console.warn('Could not copy to clipboard');
+                                        copied: false,
+                                        async copy() {
+                                            try {
+                                                await navigator.clipboard.writeText('{{ $manualSetupKey }}');
+                                                this.copied = true;
+                                                setTimeout(() => this.copied = false, 1500);
+                                            } catch (e) {
+                                                console.warn('Could not copy to clipboard');
+                                            }
                                         }
-                                    }
-                                }">
+                                    }">
                         <div class="flex items-stretch w-full border rounded-xl dark:border-stone-700">
                             @empty($manualSetupKey)
                                 <div class="flex items-center justify-center w-full p-3 bg-stone-100 dark:bg-stone-700">

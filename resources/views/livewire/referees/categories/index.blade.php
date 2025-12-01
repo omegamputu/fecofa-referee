@@ -64,7 +64,7 @@ new class extends Component {
 
     public function createCategory(): void
     {
-        $this->authorize('manage', RefereeCategory::class); // si tu ajoutes une policy plus tard
+        $this->authorize('manage_referee_categories', RefereeCategory::class); // si tu ajoutes une policy plus tard
 
         $data = $this->validate($this->createRules());
 
@@ -78,12 +78,12 @@ new class extends Component {
 
         $this->resetPage();
 
-        $this->redirectRoute('admin.referees.categories.index');
+        $this->redirectRoute('referees.categories.index');
     }
 
     public function editCategory(int $id): void
     {
-        $this->authorize('manage', RefereeCategory::class);
+        $this->authorize('manage_referee_categories', RefereeCategory::class);
 
         $category = RefereeCategory::findOrFail($id);
 
@@ -108,7 +108,7 @@ new class extends Component {
 
         session()->flash('status', __('Category updated successfully.'));
 
-        $this->redirectRoute('admin.referees.categories.index');
+        $this->redirectRoute('referees.categories.index');
     }
 
     public function deleteCategory(int $id): void

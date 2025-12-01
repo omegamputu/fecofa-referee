@@ -1,18 +1,17 @@
 <?php
 
 use Livewire\Volt\Component;
-use Livewire\WithFileUploads;
-use App\Models\Referees\Referee;
 use Illuminate\Support\Facades\DB;
 use App\Models\League;
 use App\Models\Referees\RefereeRole;
+use App\Models\Referees\Referee;
 use App\Models\Referees\RefereeCategory;
+use Livewire\WithFileUploads;
+use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 
 new class extends Component {
     use WithFileUploads;
-
-    public ?Referee $referee = null;
 
     // Champs du formulaire
     public string $last_name = '';
@@ -30,85 +29,45 @@ new class extends Component {
     public ?string $number = null;
     public ?string $issue_date = null;
     public ?string $expiry_date = null;
-    //
-    public int $originalLeagueId; // Pour vérifier si la ligue a changé
+
     public ?int $league_id = null;
     public ?int $start_year = null;
-    public ?int $referee_category_id = null;
-    public ?int $referee_role_id = null;
+    public ?int $referee_category_id = null; // Category of the referee
+    public ?int $referee_role_id = null; // Function of the referee
 
     // Upload photo
     public $profile_photo = null;
     public ?string $profile_photo_preview = null;
 
-    // Listes pour les <select>
-    public $leagues = [];
-    public $categories = [];
-    public $roles = [];
-
-
-    public function mount(Referee $referee)
+    // Chargement des listes (ligues, rôles)
+    public function with(): array
     {
-        $this->referee = $referee;
-
-        // ----- 1. Précharger les listes -----
-        $this->leagues = League::select('id', 'code', 'name')
-            ->orderBy('code')
-            ->get();
-
-        $this->categories = RefereeCategory::select('id', 'name')
-            ->orderBy('name')
-            ->get();
-
-        $this->roles = RefereeRole::select('id', 'name')
-            ->orderBy('name')
-            ->get();
-
-        // ----- 2. Hydrater les champs depuis le modèle -----
-        $this->last_name = $referee->last_name;
-        $this->first_name = $referee->first_name;
-        $this->date_of_birth = $referee->date_of_birth?->format('Y-m-d');
-        $this->gender = $referee->gender;
-        $this->education_level = $referee->education_level;
-        $this->profession = $referee->profession;
-
-        $this->phone = $referee->phone;
-        $this->email = $referee->email;
-        $this->address = $referee->address;
-
-        $this->originalLeagueId = $referee->league_id; // Pour vérifier si la ligue a changé
-
-        $this->league_id = $referee->league_id;
-        $this->referee_category_id = $referee->referee_category_id;
-        $this->start_year = $referee->start_year;
-        $this->referee_role_id = $referee->referee_role_id;
-
-        // ----- 3. Document d’identité existant (s’il y en a un) -----
-        /** @var \App\Models\Referees\IdentityDocument|null $doc */
-        $doc = $referee->identityDocument()->first();
-
-        if ($doc) {
-            $this->identity_type = $doc->type;
-            $this->number = $doc->number;
-            $this->issue_date = $doc->issue_date?->format('Y-m-d');
-            $this->expiry_date = $doc->expiry_date?->format('Y-m-d');
-        }
-
-        // La preview ne sert que pour un nouveau fichier ; la photo actuelle
-        // est affichée dans le Blade via $referee->profile_photo_path.
-        $this->profile_photo_preview = null;
+        return [
+            'leagues' => League::select('id', 'code', 'name')->orderBy('code')->get()->toArray(),
+            'categories' => RefereeCategory::select('id', 'name')->orderBy('id')->get()->toArray(),
+            'roles' => RefereeRole::select('id', 'name')->orderBy('name')->get()->toArray(),
+        ];
     }
 
-    /**
-     * Preview live quand on choisit une nouvelle photo
-     */
+    public function updatedStartYear($value): void
+    {
+        if ($value && is_numeric($value)) {
+            $year = intval($value);
+
+            if ($year >= 1980 && $year <= now()->year + 1) {
+                $this->referee_start_year = $year;
+            } else {
+                $this->addError('start_year', __('Invalid year'));
+            }
+        }
+    }
+
+    // Preview de la photo quand on choisit un fichier
     public function updatedProfilePhoto(): void
     {
-        if ($this->profile_photo) {
-            $this->validateOnly('profile_photo', [
-                'profile_photo' => ['image', 'max:2048'], // 2 Mo
-            ]);
+        $this->validateOnly('profile_photo');
 
+        if ($this->profile_photo) {
             $this->profile_photo_preview = $this->profile_photo->temporaryUrl();
         }
     }
@@ -133,7 +92,7 @@ new class extends Component {
             'last_name' => ['required', 'string', 'max:255'],
             'first_name' => ['required', 'string', 'max:255'],
             'date_of_birth' => ['nullable', 'date'],
-            'gender' => ['required', 'in:male,female'],
+            'gender' => ['required', Rule::in(['male', 'female'])],
             'education_level' => ['nullable', 'string', 'max:255'],
             'profession' => ['nullable', 'string', 'max:255'],
 
@@ -141,14 +100,7 @@ new class extends Component {
             'email' => ['nullable', 'email', 'max:255'],
             'address' => ['nullable', 'string'],
 
-            'league_id' => ['required', 'exists:leagues,id'],
-            'referee_category_id' => ['required', 'exists:referee_categories,id'],
-            'start_year' => ['nullable', 'integer', 'min:1980', 'max:' . now()->year],
-            'referee_role_id' => ['required', 'exists:referee_roles,id'],
-
-            'profile_photo' => ['nullable', 'image', 'max:2048'],
-
-            'identity_type' => ['nullable', Rule::in(['passport', 'national_id', 'other'])],
+            'identity_type' => ['nullable', Rule::in(['passport', 'national_id', 'other', ''])],
             'number' => [
                 Rule::requiredIf($this->identity_type === 'passport'),
                 'nullable',
@@ -166,66 +118,67 @@ new class extends Component {
                 'date',
                 'after_or_equal:issue_date',
             ],
+
+            'league_id' => ['required', 'exists:leagues,id'],
+            'start_year' => ['nullable', 'integer', 'min:1980', 'max:' . date('Y')],
+            'referee_category_id' => ['required', 'exists:referee_categories,id'],
+            'referee_role_id' => ['required', 'exists:referee_roles,id'],
+
+            'profile_photo' => ['nullable', 'image', 'max:2048'], // 2 Mo
         ];
     }
 
-    public function update(): void
+    public function save(): void
     {
-
         //1. Validation des datas
         $data = $this->validate();
 
-        // ----- 2. Transaction pour tout mettre à jour proprement -----
-        DB::transaction(function () use ($data) {
-            // On recharge avec lock pour éviter la concurrence
-            $referee = Referee::lockForUpdate()->findOrFail($this->referee->id);
+        // 2. Récupérer la ligue du referee
+        $league = League::findOrFail($data['league_id']);
 
-            $leagueChanged = $data['league_id'] !== $this->originalLeagueId;
+        // On aura besoin de $referee après la transaction
+        $referee = null;
 
-            // Si la ligue a changé, il faut générer un NOUVEL ID pour
+        // 3. Transaction
+        DB::transaction(function () use ($data, $league, &$referee) {
 
-            if ($leagueChanged) {
-                $league = League::findOrFail($data['league_id']);
+            $personId = $this->generateRefereeId($league);
 
-                // Génère un NOUVEL ID pour la nouvelle ligue
-                $newPersonId = $this->generateRefereeId($league);
-
-                $referee->update([
-                    'person_id' => $newPersonId,
-                    'league_id' => $league->id,
-                ]);
-
+            // 3.5 Filet de sécurité supplémentaire (au cas où)
+            if (Referee::where('person_id', $personId)->exists()) {
+                // Ici on peut relancer une exception => rollback automatique
+                throw new \RuntimeException("Duplicate referee_id generated: {$personId}");
             }
 
-            // a) Mise à jour de l’arbitre
-            $this->referee->fill([
-                'last_name' => $this->last_name,
-                'first_name' => $this->first_name,
-                'date_of_birth' => $this->date_of_birth ?: null,
-                'gender' => $this->gender,
-                'education_level' => $this->education_level,
-                'profession' => $this->profession,
+            // 3.6 Upload de la photo éventuelle
+            $photoPath = null;
+            if ($this->profile_photo) {
+                $photoPath = $this->uploadProfilePhoto();
+            }
 
-                'phone' => $this->phone,
-                'email' => $this->email,
-                'address' => $this->address,
+            $startYear = $this->updatedStartYear($data['start_year']);
+            // 
 
-                'league_id' => $this->league_id,
-                'referee_category_id' => $this->referee_category_id,
-                'start_year' => $this->start_year,
-                'referee_role_id' => $this->referee_role_id,
+            // 3.7 Création de l’arbitre
+            $referee = Referee::create([
+                'league_id' => $data['league_id'],
+                'referee_role_id' => $data['referee_role_id'],
+                'person_id' => $personId,
+                'last_name' => $data['last_name'],
+                'first_name' => $data['first_name'],
+                'date_of_birth' => $data['date_of_birth'],
+                'gender' => $data['gender'],
+                'phone' => $data['phone'],
+                'email' => $data['email'],
+                'address' => $data['address'],
+                'education_level' => $data['education_level'],
+                'profession' => $data['profession'],
+                'start_year' => $startYear,
+                'referee_category_id' => $data['referee_category_id'],
+                'profile_photo_path' => $photoPath,
             ]);
 
-            // b) Gestion de la photo (si nouvelle)
-            if ($this->profile_photo) {
-                //$path = $this->profile_photo->store('referees', 'public');
-                $path = $this->uploadProfilePhoto();
-                $this->referee->profile_photo_path = $path;
-            }
-
-            $this->referee->save();
-
-            // c) Document d’identité
+            // 3.8 Création du document d’identité lié
             if ($this->identity_type) {
                 $payload = [
                     'type' => $this->identity_type,
@@ -235,22 +188,21 @@ new class extends Component {
                 ];
 
                 // updateOrCreate sur la relation hasOne
-                $this->referee->identityDocument()
+                $referee->identityDocument()
                     ->updateOrCreate(
-                        ['referee_id' => $this->referee->id],
+                        ['referee_id' => $referee->id],
                         $payload
                     );
             } else {
                 // Si aucun type sélectionné, on supprime le document éventuel
-                $this->referee->identityDocument()->delete();
+                $referee->identityDocument()->delete();
             }
         });
 
-        // ----- 3. Feedback et redirection -----
-        session()->flash('status', __('Referee updated successfully.'));
+        // Petit flash + redirection vers la liste
+        session()->flash('status', __('Referee created successfully.'));
 
-        // Redirection vers la liste (adapter le nom de route si besoin)
-        $this->redirectRoute('admin.referees.index');
+        $this->redirectRoute('referees.index');
     }
 
     public function generateRefereeId(League $league): string
@@ -278,6 +230,8 @@ new class extends Component {
         // Final ID : LIFKIN-000123, etc.
         return "{$league->code}-{$formattedNumber}";
     }
+
+
 }
 
 ?>
@@ -289,16 +243,16 @@ new class extends Component {
 
         <!-- Title -->
         <header class="mb-6">
-            <h1 class="text-3xl font-semibold text-neutral-900 dark:text-neutral-400">{{ __("Update referee") }}</h1>
+            <h1 class="text-3xl font-semibold text-neutral-900 dark:text-neutral-400">{{ __("Add referee") }}</h1>
             <p class="mt-1 text-sm text-neutral-500">
                 {{ __("Fill in the referee personal details, league and function.") }}
             </p>
         </header>
 
-        <div class="grid grid-cols-3 gap-4 mb-6 dark:text-gray-700">
+        <div class="grid grid-cols-3 gap-4 mb-6">
             <div class="flex flex-col col-span-2 gap-4 mb-6">
                 <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-700 w-full p-6 rounded-xl">
-                    <h2 class="text-xl font-semibold mb-4 dark:text-slate-400">
+                    <h2 class="text-xl font-semibold dark:text-slate-400 mb-4">
                         {{ __("Referee Information") }}
                     </h2>
 
@@ -332,7 +286,7 @@ new class extends Component {
                         </div>
 
                         {{-- Photo de profil --}}
-                        <div class="flex flex-col items-start gap-4">
+                        <div class="flex flex-col items-center gap-4">
                             @if ($profile_photo_preview)
                                 <div class="border p-2">
                                     <img src="{{ $profile_photo_preview }}" class="h-12 w-12 rounded object-cover"
@@ -340,7 +294,7 @@ new class extends Component {
                                 </div>
                             @elseif(!empty($referee?->profile_photo_path ?? null))
                                 <img src="{{ asset('storage/' . $referee->profile_photo_path) }}"
-                                    class="h-24 w-24 rounded object-cover overflow-hidden" alt="Referee photo">
+                                    class="h-12 w-12 rounded object-cover" alt="Referee photo">
                             @else
                                 <div class="col-span-full">
                                     <label for="photo" class="block text-sm/6 font-medium text-white">Photo</label>
@@ -369,7 +323,7 @@ new class extends Component {
                 </div>
 
                 <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-700 p-6 rounded-xl">
-                    <h2 class="text-xl font-semibold mb-4 dark:text-slate-400">
+                    <h2 class="text-xl font-semibold dark:text-slate-400 mb-4">
                         {{ __("Contact details") }}
                     </h2>
 
@@ -387,7 +341,7 @@ new class extends Component {
                 </div>
 
                 <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-700 w-full p-6 rounded-xl">
-                    <h2 class="text-xl font-semibold mb-4 dark:text-slate-400">
+                    <h2 class="text-xl font-semibold dark:text-slate-400 mb-4">
                         {{ __("Identity Document") }}
                     </h2>
 
@@ -415,7 +369,6 @@ new class extends Component {
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>
@@ -424,7 +377,7 @@ new class extends Component {
 
             <div class="flex flex-col gap-4">
                 <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-700 p-6 rounded-xl">
-                    <h2 class="text-xl font-semibold mb-4 dark:text-slate-400">
+                    <h2 class="text-xl font-semibold dark:text-slate-400 mb-4">
                         {{ __("Affiliated league") }}
                     </h2>
                     <div>
@@ -443,7 +396,7 @@ new class extends Component {
                     </div>
                 </div>
                 <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-700 p-6 rounded-xl">
-                    <h2 class="text-xl font-semibold mb-4 dark:text-slate-400">
+                    <h2 class="text-xl font-semibold dark:text-slate-400 mb-4">
                         {{ __("Refereeing career") }}
                     </h2>
 
@@ -487,8 +440,9 @@ new class extends Component {
             </span>
 
             {{-- Bouton Enregistrer --}}
-            <flux:button class="text-white font-medium rounded-3xl text-sm px-4 py-3 focus:outline-none cursor-pointer"
-                wire:click="update" wire:loading.attr="disabled">
+            <flux:button
+                class="text-white font-medium border rounded-3xl text-sm px-4 py-3 focus:outline-none cursor-pointer"
+                wire:click="save" wire:loading.attr="disabled">
                 <span wire:loading.remove>{{ __('Save') }}</span>
                 <span wire:loading>{{ __('Saving...') }}</span>
             </flux:button>
