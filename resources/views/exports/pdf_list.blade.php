@@ -170,7 +170,7 @@
 
         <table class="pdf-footer-table">
             <tr>
-                <td class="pdf-footer-left">FECOFA – Gestion des arbitres</td>
+                <td class="pdf-footer-left">{{ config('app.name') }}</td>
                 <td class="pdf-footer-right">
                     {{ __("Printed at") }} {{ $generatedAt->format('d/m/Y') }} {{ $generatedAt->format('H:i') }}
                 </td>

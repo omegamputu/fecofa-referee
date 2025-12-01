@@ -13,6 +13,7 @@ class UserIndexQuery
             ->with('roles:id,name')
             ->whereDoesntHave('roles', fn ($q) => $q->where('name', 'Owner'))
             ->when($search, fn ($q) => $q->where('name', 'like', "%{$search}%"))
+            ->orderBy("id","asc")
             ->latest('created_at')
             ->paginate($perPage);
     }

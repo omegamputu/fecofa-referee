@@ -43,7 +43,7 @@ class InviteUserToSetPassword extends Notification
         ], false));
 
         return (new MailMessage)
-            ->subject('You are invited to set your password')
+            ->subject('Vous êtes invité à définir votre mot de passe')
             ->markdown('mail.user.invitation', [
                 'user' => $notifiable,
                 'url' => $url,

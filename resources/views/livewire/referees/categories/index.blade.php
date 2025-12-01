@@ -123,7 +123,7 @@ new class extends Component {
 
         $this->resetPage();
 
-        $this->redirectRoute('admin.referees.categories.index');
+        $this->redirectRoute('referees.categories.index');
     }
 }
 ?>
