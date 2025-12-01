@@ -44,9 +44,13 @@ new class extends Component {
             'leagues' => League::query()
                 ->when($this->search, function ($q) {
                     $q->where('name', 'like', "%{$this->search}%")
+<<<<<<< HEAD
+=======
+                        ->orWhere('code', 'like', "%{$this->search}%")
+>>>>>>> release/1.0.0
                         ->orWhere('province', 'like', "%{$this->search}%");
                 })
-                ->orderBy('name')
+                ->orderBy('id', 'desc')
                 ->paginate($this->perPage),
         ];
     }
@@ -147,7 +151,11 @@ new class extends Component {
 
 ?>
 
+<<<<<<< HEAD
+<section class="bg-white rounded-3xl py-6 container mx-auto h-full w-full max-w-7xl px-6">
+=======
 <section class="container mx-auto w-full max-w-7xl bg-white dark:bg-neutral-900 py-6 px-6 rounded-3xl">
+>>>>>>> release/1.0.0
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
 
@@ -167,7 +175,11 @@ new class extends Component {
                             d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                     </svg>
                 </div>
+<<<<<<< HEAD
                 <input type="text" id="default-search" wire:model.debounce.300ms="search"
+=======
+                <input type="text" id="default-search" wire:model.debounce.400ms="search"
+>>>>>>> release/1.0.0
                     class="block w-full p-3 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="{{ __("Search by name") }}" required />
             </div>
@@ -178,6 +190,51 @@ new class extends Component {
         </flux:modal.trigger>
     </div>
 
+<<<<<<< HEAD
+    {{-- Tableau --}}
+    <table
+        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-neutral-200 dark:border-neutral-700 rounded-xl">
+        <thead class="text-xs text-gray-700 dark:text-gray-400 uppercase">
+            <tr>
+                <th scope="col" class="px-6 py-3">{{ __("Name") }}</th>
+                <th scope="col" class="px-6 py-3">{{ __("Code") }}</th>
+                <th scope="col" class="px-6 py-3">{{ __("Province") }}</th>
+                <th scope="col" class="px-6 py-3">{{ __("Headquarters") }}</th>
+                <th scope="col" class="px-6 py-3">{{ __("Contact") }}</th>
+                <th scope="col" class="px-6 py-3">{{ __("Actions") }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($leagues as $league)
+                <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                    <td class="px-6 py-4">{{ $league->name }}</td>
+                    <td class="px-6 py-4">{{ $league->code }}</td>
+                    <td class="px-6 py-4">{{ $league->province }}</td>
+                    <td class="px-6 py-4">{{ $league->headquarters }}</td>
+                    <td class="px-6 py-4">
+                        {{ $league->contact_email }}<br>
+                        {{ $league->contact_phone }}
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex gap-2">
+                            {{-- Edit --}}
+                            <flux:modal.trigger name="edit-league-{{ $league->id }}">
+                                <flux:button wire:click="editLeague({{ $league->id }})" size="sm" class="cursor-pointer">
+                                    {{ __("Edit") }}</flux:button>
+                            </flux:modal.trigger>
+
+                            {{-- Delete --}}
+                            <flux:modal.trigger name="delete-league-{{ $league->id }}">
+                                <flux:button variant="danger" size="sm" class="cursor-pointer">{{ __("Delete") }}
+                                </flux:button>
+                            </flux:modal.trigger>
+                        </div>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+=======
     <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-600 rounded-xl">
         {{-- Tableau --}}
         <table
@@ -225,6 +282,7 @@ new class extends Component {
             </tbody>
         </table>
     </div>
+>>>>>>> release/1.0.0
 
     <div class="mt-4">
         {{ $leagues->links() }}
