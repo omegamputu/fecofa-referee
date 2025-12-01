@@ -66,7 +66,7 @@ new class extends Component {
         {{-- Titre --}}
         <header class="mb-6 flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-semibold text-neutral-900">
+                <h1 class="text-2xl font-semibold dark:text-neutral-400 text-neutral-900">
                     {{ __('Dashboard') }}
                 </h1>
                 <p class="mt-1 text-sm text-neutral-500">
@@ -92,22 +92,22 @@ new class extends Component {
 
         {{-- 1. Cartes statistiques --}}
         <section class="grid gap-4 md:grid-cols-4 mb-8">
-            <div class="bg-white rounded-xl p-4">
+            <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-600 rounded-xl p-4">
                 <p class="text-xs uppercase text-neutral-500">{{ __('Total referees') }}</p>
                 <p class="mt-2 text-2xl font-semibold">{{ $totalReferees }}</p>
             </div>
 
-            <div class="bg-white rounded-xl p-4">
+            <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-600 rounded-xl p-4">
                 <p class="text-xs uppercase text-neutral-500">{{ __('International') }}</p>
                 <p class="mt-2 text-2xl font-semibold">{{ $international }}</p>
             </div>
 
-            <div class="bg-white rounded-xl p-4">
+            <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-600 rounded-xl p-4">
                 <p class="text-xs uppercase text-neutral-500">{{ __('National') }}</p>
                 <p class="mt-2 text-2xl font-semibold">{{ $national }}</p>
             </div>
 
-            <div class="bg-white rounded-xl p-4">
+            <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-600 rounded-xl p-4">
                 <p class="text-xs uppercase text-neutral-500">{{ __('New this month') }}</p>
                 <p class="mt-2 text-2xl font-semibold">{{ $newThisMonth }}</p>
             </div>
@@ -115,8 +115,8 @@ new class extends Component {
 
         <div class="grid gap-6 md:grid-cols-2">
             {{-- 2. Derniers arbitres ajoutés --}}
-            <section class="bg-white rounded-xl p-4">
-                <h2 class="text-base font-semibold mb-3">
+            <section class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-600 rounded-xl p-4">
+                <h2 class="text-base font-semibold dark:text-neutral-500 mb-3">
                     {{ __('Latest registered referees') }}
                 </h2>
 
@@ -127,7 +127,7 @@ new class extends Component {
                 @else
                     <div class="overflow-x-auto">
                         <table class="min-w-full text-sm">
-                            <thead class="border-b text-neutral-500 text-xs">
+                            <thead class="border-b dark:border-neutral-600 text-neutral-500 text-xs">
                                 <tr>
                                     <th class="py-2 text-left">Person ID</th>
                                     <th class="py-2 text-left">{{ __('Name') }}</th>
@@ -160,7 +160,7 @@ new class extends Component {
 
                     <div class="mt-3 text-right">
                         <a href="{{ route('referees.index') }}" wire:navigate
-                            class="text-xs text-primary-600 hover:underline">
+                            class="text-xs text-primary-600 dark:text-[#0080C0] hover:underline">
                             {{ __('View all referees') }} →
                         </a>
                     </div>
@@ -168,8 +168,8 @@ new class extends Component {
             </section>
 
             {{-- 3. Documents à surveiller --}}
-            <section class="bg-white rounded-xl p-4">
-                <h2 class="text-base font-semibold mb-3">
+            <section class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-600 rounded-xl p-4">
+                <h2 class="text-base font-semibold dark:text-neutral-500 mb-3">
                     {{ __('Documents expiring soon') }}
                 </h2>
 
@@ -180,7 +180,7 @@ new class extends Component {
                 @else
                     <div class="overflow-x-auto">
                         <table class="min-w-full text-sm">
-                            <thead class="border-b text-neutral-500 text-xs uppercase">
+                            <thead class="border-b dark:border-neutral-600 text-neutral-500 text-xs uppercase">
                                 <tr>
                                     <th class="py-2 text-left">{{ __('Referee') }}</th>
                                     <th class="py-2 text-left">{{ __('Type') }}</th>
@@ -211,8 +211,8 @@ new class extends Component {
 
         <div class="grid gap-6 md:grid-cols-2">
             {{-- 4. Répartition par catégorie --}}
-            <section class="bg-white rounded-xl p-4 mt-6">
-                <h2 class="text-base font-semibold mb-3">
+            <section class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-600 rounded-xl p-4 mt-6">
+                <h2 class="text-base font-semibold dark:text-neutral-500 mb-3">
                     {{ __('Breakdown by category') }}
                 </h2>
 
@@ -222,7 +222,7 @@ new class extends Component {
                     </p>
                 @else
                     <table class="min-w-[250px] text-sm">
-                        <thead class="border-b text-neutral-500 text-xs">
+                        <thead class="border-b dark:border-neutral-600 text-neutral-500 text-xs">
                             <tr>
                                 <th class="py-2 text-left">{{ __('Category') }}</th>
                                 <th class="py-2 text-left">{{ __('Number of referees') }}</th>
@@ -241,8 +241,8 @@ new class extends Component {
             </section>
 
             {{-- Répartition par ligue --}}
-            <section class="bg-white rounded-xl p-4 mt-6">
-                <h2 class="text-base font-semibold mb-3">
+            <section class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-600 rounded-xl p-4 mt-6">
+                <h2 class="text-base font-semibold dark:text-neutral-500 mb-3">
                     {{ __('Breakdown by league') }}
                 </h2>
 
@@ -252,7 +252,7 @@ new class extends Component {
                     </p>
                 @else
                     <table class="min-w-[300px] text-sm">
-                        <thead class="border-b text-neutral-500 text-xs">
+                        <thead class="border-b dark:border-neutral-600 text-neutral-500 text-xs">
                             <tr>
                                 <th class="py-2 text-left">{{ __('League') }}</th>
                                 <th class="py-2 text-left">{{ __('Number of referees') }}</th>

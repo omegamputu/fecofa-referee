@@ -149,104 +149,106 @@ new class extends Component {
         @endcan
     </div>
 
-    <table
-        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-slate-400 bg-white dark:bg-[#0E1526] py-6 px-6 rounded-xl">
-        <thead class="text-xs text-gray-700 dark:text-slate-400">
-            <tr>
-                <th class="px-4 py-3">{{ __('Person ID') }}</th>
-                <th class="px-4 py-3">{{ __('Full name') }}</th>
-                <th class="px-4 py-3">{{ __('League') }}</th>
-                <th class="px-4 py-3">{{ __('Status') }}</th>
-                <th class="px-4 py-3 text-center">{{ __('Category') }}</th>
-                <th class="px-4 py-3">{{ __('Function') }}</th>
-                <th class="px-4 py-3 text-center">{{ __('Phone number') }}</th>
-                <th class="px-4 py-3 text-center">{{ __('Actions') }}</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($referees as $referee)
-                <tr class="dark:text-slate-400">
-                    <td class="px-4 py-3">
-                        {{ $referee->person_id }}
-                    </td>
-                    {{-- Colonne arbitre --}}
-                    <td class="px-4 py-3">
-                        <div class="flex items-center gap-3">
-                            @if($referee->profile_photo_path)
-                                <img src="{{ asset('storage/' . $referee->profile_photo_path) }}" alt="Referee photo"
-                                    class="h-9 w-9 shrink-0 overflow-hidden rounded-full object-cover">
-                            @else
+    <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-600 rounded-xl">
+        <table
+            class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-slate-400 bg-white dark:bg-[#0E1526] py-6 px-6 rounded-xl">
+            <thead class="text-xs text-gray-700 dark:text-slate-400">
+                <tr>
+                    <th class="px-4 py-3">{{ __('Person ID') }}</th>
+                    <th class="px-4 py-3">{{ __('Full name') }}</th>
+                    <th class="px-4 py-3">{{ __('League') }}</th>
+                    <th class="px-4 py-3">{{ __('Status') }}</th>
+                    <th class="px-4 py-3 text-center">{{ __('Category') }}</th>
+                    <th class="px-4 py-3">{{ __('Function') }}</th>
+                    <th class="px-4 py-3 text-center">{{ __('Phone number') }}</th>
+                    <th class="px-4 py-3 text-center">{{ __('Actions') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($referees as $referee)
+                    <tr class="dark:text-slate-400">
+                        <td class="px-4 py-3">
+                            {{ $referee->person_id }}
+                        </td>
+                        {{-- Colonne arbitre --}}
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-3">
+                                @if($referee->profile_photo_path)
+                                    <img src="{{ asset('storage/' . $referee->profile_photo_path) }}" alt="Referee photo"
+                                        class="h-9 w-9 shrink-0 overflow-hidden rounded-full object-cover">
+                                @else
 
-                                <span
-                                    class="relative flex h-9 w-9 shrink-0 overflow-hidden rounded-full bg-neutral-700 text-xs font-semibold items-center justify-center">
-                                    {{ strtoupper(Str::substr($referee->first_name, 0, 1) . Str::substr($referee->last_name, 0, 1)) }}
-                                </span>
+                                    <span
+                                        class="relative flex h-9 w-9 shrink-0 overflow-hidden rounded-full bg-neutral-700 text-xs font-semibold items-center justify-center">
+                                        {{ strtoupper(Str::substr($referee->first_name, 0, 1) . Str::substr($referee->last_name, 0, 1)) }}
+                                    </span>
 
-                            @endif
+                                @endif
 
-                            <div>
-                                <div class="font-semibold">
-                                    {{ $referee->last_name }} {{ $referee->first_name }}
-                                </div>
-                                <div class="text-xs text-neutral-400">
-                                    {{ ucfirst($referee->gender ?? '')}},
-                                    {{ optional($referee->date_of_birth)->format('d/m/Y') }}
-                                    – {{ $referee->refereeRole?->name }}
+                                <div>
+                                    <div class="font-semibold">
+                                        {{ $referee->last_name }} {{ $referee->first_name }}
+                                    </div>
+                                    <div class="text-xs text-neutral-400">
+                                        {{ ucfirst($referee->gender ?? '')}},
+                                        {{ optional($referee->date_of_birth)->format('d/m/Y') }}
+                                        – {{ $referee->refereeRole?->name }}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </td>
+                        </td>
 
-                    {{-- Ligue --}}
-                    <td class="px-4 py-3">
-                        {{ $referee->league?->code }}
-                    </td>
+                        {{-- Ligue --}}
+                        <td class="px-4 py-3">
+                            {{ $referee->league?->code }}
+                        </td>
 
-                    {{-- Status --}}
-                    <td class="px-4 py-3">
-                        @if ($referee->is_active)
-                            <flux:badge color="green" size="sm" class="dark:text-white dark:bg-green-500">{{ __("Active") }}
-                            </flux:badge>
-                        @else
-                            <flux:badge color="red" size="sm">{{ __("Inactive") }}</flux:badge>
-                        @endif
-                    </td>
+                        {{-- Status --}}
+                        <td class="px-4 py-3">
+                            @if ($referee->is_active)
+                                <flux:badge color="green" size="sm" class="dark:text-white dark:bg-green-500">{{ __("Active") }}
+                                </flux:badge>
+                            @else
+                                <flux:badge color="red" size="sm">{{ __("Inactive") }}</flux:badge>
+                            @endif
+                        </td>
 
-                    {{-- Category --}}
-                    <td class="px-4 py-3 text-center">
-                        {{ ucfirst($referee->refereeCategory?->name) }}
-                    </td>
+                        {{-- Category --}}
+                        <td class="px-4 py-3 text-center">
+                            {{ ucfirst($referee->refereeCategory?->name) }}
+                        </td>
 
-                    {{-- Fonction --}}
-                    <td class="px-4 py-3">
-                        {{ $referee->refereeRole?->name }}
-                    </td>
+                        {{-- Fonction --}}
+                        <td class="px-4 py-3">
+                            {{ $referee->refereeRole?->name }}
+                        </td>
 
-                    {{-- Tests physiques --}}
-                    <td class="px-4 py-3 text-center">
-                        {{ $referee->phone ?? '-' }}
-                    </td>
+                        {{-- Tests physiques --}}
+                        <td class="px-4 py-3 text-center">
+                            {{ $referee->phone ?? '-' }}
+                        </td>
 
-                    {{-- Actions --}}
-                    <td class="px-4 py-3 text-center">
-                        @can('edit_referee')
-                            <flux:button size="xs" variant="ghost"
-                                class="cursor-pointer dark:bg-[#0E1526] dark:text-white hover:dark:bg-[#0080C0]"
-                                :href="route('referees.edit', $referee)" wire:navigate>
-                                {{ __('Edit') }}
-                            </flux:button>
-                        @endcan
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="7" class="px-4 py-6 text-center text-neutral-400">
-                        {{ __('No referees found.') }}
-                    </td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+                        {{-- Actions --}}
+                        <td class="px-4 py-3 text-center">
+                            @can('edit_referee')
+                                <flux:button size="xs" variant="ghost"
+                                    class="cursor-pointer dark:bg-[#0E1526] dark:text-white hover:dark:bg-[#0080C0]"
+                                    :href="route('referees.edit', $referee)" wire:navigate>
+                                    {{ __('Edit') }}
+                                </flux:button>
+                            @endcan
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="px-4 py-6 text-center text-neutral-400">
+                            {{ __('No referees found.') }}
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 
     <div class="mt-4">
         {{ $referees->links() }}

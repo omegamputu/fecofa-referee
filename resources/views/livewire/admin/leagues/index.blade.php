@@ -178,50 +178,53 @@ new class extends Component {
         </flux:modal.trigger>
     </div>
 
-    {{-- Tableau --}}
-    <table
-        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 bg-white dark:bg-[#0E1526] py-6 px-6 rounded-xl">
-        <thead class="text-xs text-gray-700 dark:text-gray-400">
-            <tr>
-                <th scope="col" class="px-6 py-3">{{ __("Name") }}</th>
-                <th scope="col" class="px-6 py-3">{{ __("Code") }}</th>
-                <th scope="col" class="px-6 py-3">{{ __("Province") }}</th>
-                <th scope="col" class="px-6 py-3">{{ __("Headquarters") }}</th>
-                <th scope="col" class="px-6 py-3">{{ __("Contact") }}</th>
-                <th scope="col" class="px-6 py-3">{{ __("Actions") }}</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($leagues as $league)
+    <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-600 rounded-xl">
+        {{-- Tableau --}}
+        <table
+            class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 bg-white dark:bg-[#0E1526] py-6 px-6 rounded-xl">
+            <thead class="text-xs text-gray-700 dark:text-gray-400">
                 <tr>
-                    <td class="px-6 py-4">{{ $league->name }}</td>
-                    <td class="px-6 py-4">{{ $league->code }}</td>
-                    <td class="px-6 py-4">{{ $league->province }}</td>
-                    <td class="px-6 py-4">{{ $league->headquarters }}</td>
-                    <td class="px-6 py-4">
-                        {{ $league->contact_email }}<br>
-                        {{ $league->contact_phone }}
-                    </td>
-                    <td class="px-6 py-4">
-                        <div class="flex gap-2">
-                            {{-- Edit --}}
-                            <flux:modal.trigger name="edit-league-{{ $league->id }}">
-                                <flux:button wire:click="editLeague({{ $league->id }})" size="sm" class="cursor-pointer">
-                                    {{ __("Edit") }}
-                                </flux:button>
-                            </flux:modal.trigger>
-
-                            {{-- Delete --}}
-                            <flux:modal.trigger name="delete-league-{{ $league->id }}">
-                                <flux:button variant="danger" size="sm" class="cursor-pointer">{{ __("Delete") }}
-                                </flux:button>
-                            </flux:modal.trigger>
-                        </div>
-                    </td>
+                    <th scope="col" class="px-6 py-3">{{ __("Name") }}</th>
+                    <th scope="col" class="px-6 py-3">{{ __("Code") }}</th>
+                    <th scope="col" class="px-6 py-3">{{ __("Province") }}</th>
+                    <th scope="col" class="px-6 py-3">{{ __("Headquarters") }}</th>
+                    <th scope="col" class="px-6 py-3">{{ __("Contact") }}</th>
+                    <th scope="col" class="px-6 py-3">{{ __("Actions") }}</th>
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach($leagues as $league)
+                    <tr>
+                        <td class="px-6 py-4">{{ $league->name }}</td>
+                        <td class="px-6 py-4">{{ $league->code }}</td>
+                        <td class="px-6 py-4">{{ $league->province }}</td>
+                        <td class="px-6 py-4">{{ $league->headquarters }}</td>
+                        <td class="px-6 py-4">
+                            {{ $league->contact_email }}<br>
+                            {{ $league->contact_phone }}
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex gap-2">
+                                {{-- Edit --}}
+                                <flux:modal.trigger name="edit-league-{{ $league->id }}">
+                                    <flux:button wire:click="editLeague({{ $league->id }})" size="sm"
+                                        class="cursor-pointer">
+                                        {{ __("Edit") }}
+                                    </flux:button>
+                                </flux:modal.trigger>
+
+                                {{-- Delete --}}
+                                <flux:modal.trigger name="delete-league-{{ $league->id }}">
+                                    <flux:button variant="danger" size="sm" class="cursor-pointer">{{ __("Delete") }}
+                                    </flux:button>
+                                </flux:modal.trigger>
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 
     <div class="mt-4">
         {{ $leagues->links() }}
