@@ -77,7 +77,7 @@ new class extends Component {
             {{-- Actions rapides --}}
             <div class="flex gap-2">
                 @can('create_referee')
-                    <flux:button href="{{ route('referees.create') }}" wire:navigate>
+                    <flux:button variant="primary" color="green" href="{{ route('referees.create') }}" wire:navigate>
                         {{ __('Add referee') }}
                     </flux:button>
                 @endcan
