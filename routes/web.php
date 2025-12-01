@@ -21,9 +21,14 @@ Route::get('/lang/{lang}', function ($lang) {
 
 Volt::route('/invite/accept/{token}', InviteSetPassword::class)->name('invite.accept');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+//Route::view('dashboard', 'dashboard')
+//    ->middleware(['auth', 'verified', 'must_set_password'])
+//    ->name('dashboard');
+
+Route::middleware(['auth', 'verified' ,'must_set_password'])->group(function () {
+    Volt::route('/dashboard', componentName: 'dashboard')
+        ->name('dashboard');
+});
 
 Route::middleware(['auth', 'permission:admin_access', 'must_set_password'])
     ->prefix('admin')->name('admin')->as('admin.')
