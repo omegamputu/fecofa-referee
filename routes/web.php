@@ -7,8 +7,8 @@ use Livewire\Volt\Volt;
 use App\Http\Controllers\Referee\ExportController;
 
 Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+    return view('livewire.auth.login');
+})->name('login');
 
 Route::get('/lang/{lang}', function ($lang) {
     $availableLangs = ['fr', 'en'];
