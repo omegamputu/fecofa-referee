@@ -4,16 +4,31 @@ use App\Livewire\Auth\InviteSetPassword;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
+use App\Http\Controllers\Referee\ExportController;
 
 Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+    return view('livewire.auth.login');
+})->name('login');
+
+Route::get('/lang/{lang}', function ($lang) {
+    $availableLangs = ['fr', 'en'];
+
+    if (in_array($lang, $availableLangs)) {
+        session(['locale' => $lang]);
+    }
+    return redirect()->back();
+})->name('lang.switch');
 
 Volt::route('/invite/accept/{token}', InviteSetPassword::class)->name('invite.accept');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+//Route::view('dashboard', 'dashboard')
+//    ->middleware(['auth', 'verified', 'must_set_password'])
+//    ->name('dashboard');
+
+Route::middleware(['auth', 'verified' ,'must_set_password'])->group(function () {
+    Volt::route('/dashboard', componentName: 'dashboard')
+        ->name('dashboard');
+});
 
 Route::middleware(['auth', 'permission:admin_access', 'must_set_password'])
     ->prefix('admin')->name('admin')->as('admin.')
@@ -24,7 +39,35 @@ Route::middleware(['auth', 'permission:admin_access', 'must_set_password'])
         Volt::route('/users', 'admin.users.index')->name('users.index');
         Volt::route('/leagues', 'admin.leagues.index')->name('leagues.index');
 });
- 
+
+////////////////////
+/// Referee routes
+Route::middleware(['auth','must_set_password'])->group(function () {
+        Volt::route('/referees/categories', 'referees.categories.index')
+            ->name('referees.categories.index')
+            ->middleware(['permission:manage_referee_categories']);
+
+        Volt::route('/referees/list', 'referees.index')
+            ->name('referees.index')
+            ->middleware(['permission:view_referee']);
+
+        Volt::route('/referees/create', 'referees.create')
+            ->name('referees.create')
+            ->middleware(['permission:create_referee']);
+
+        Volt::route('/referees/{referee}/edit', 'referees.edit')
+            ->name('referees.edit')
+            ->whereNumber('referee')
+            ->middleware(['permission:edit_referee']);
+});
+
+// Export referees PDF
+Route::get('/referees/export', [ExportController::class, 'pdf'])
+        ->name('referees.export')
+        ->middleware(['auth', 'permission:export_referee_data']);
+
+////////////////////
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 

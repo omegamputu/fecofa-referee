@@ -6,6 +6,7 @@
 </head>
 
 <body class="min-h-screen bg-neutral-200 dark:bg-neutral-900">
+<<<<<<< HEAD
     @php
         $baseLink = '!text-neutral-300 hover:!text-white hover:!font-semibold';
     @endphp
@@ -49,6 +50,76 @@
                     label="Notifications"
                     class="{{ $baseLink }} {{ request()->routeIs('admin.dashboard') ? '!text-white !font-semibold' : '' }}" />
             </flux:tooltip>
+=======
+    <flux:header container
+        class="bg-neutral-800 border-b border-neutral-800 text-neutral-50 dark:bg-[#0080C0] dark:border-neutral-900">
+        <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
+
+        <div class="flex items-center space-x-2 me-5">
+            <span class="text-xl font-extrabold tracking-wide">FECOFA</span>
+            <span class="text-gray-400">|</span>
+            <span class="text-lg text-gray-300">{{ __("Refereeing") }}</span>
+        </div>
+
+        @php
+            $baseLink = '!text-neutral-300 hover:!text-white hover:!font-semibold';
+        @endphp
+
+        <flux:navbar class="-mb-px max-lg:hidden">
+            @hasanyrole('Owner|Administrator')
+            @can('admin_access')
+                <flux:navbar.item icon="layout-grid" :href="route('admin.dashboard')"
+                    :current="request()->routeIs('admin.dashboard')" wire:navigate
+                    class="{{ $baseLink }} {{ request()->routeIs('admin.dashboard') ? '!text-white !font-semibold' : '' }}">
+                    {{ __('Dashboard') }}
+                </flux:navbar.item>
+            @endcan
+
+            @can('view_referee')
+                <flux:navbar.item icon="queue-list" :href="route('referees.index')"
+                    :current="request()->routeIs('referees.index')" wire:navigate
+                    class="{{ $baseLink }} {{ request()->routeIs('referees.index') ? '!text-white !font-semibold' : '' }}">
+                    {{ __('Referees') }}
+                </flux:navbar.item>
+            @endcan
+
+            @can('manage_referee_categories')
+                <flux:navbar.item icon="academic-cap" :href="route('referees.categories.index')"
+                    :current="request()->routeIs('referees.categories.index')" wire:navigate
+                    class="{{ $baseLink }} {{ request()->routeIs('referees.categories.index') ? '!text-white !font-semibold' : '' }}">
+                    {{ __('Categories') }}
+                </flux:navbar.item>
+            @endcan
+            @endhasanyrole
+
+            @hasanyrole('Member|Viewer')
+            <flux:navbar.item icon="layout-grid" :href="route('dashboard')" :current="request()->routeIs('dashboard')"
+                wire:navigate
+                class="{{ $baseLink }} {{ request()->routeIs('dashboard') ? '!text-white !font-semibold' : '' }}">
+                {{ __('Dashboard') }}
+            </flux:navbar.item>
+
+            @can('view_referee')
+                <flux:navbar.item icon="queue-list" :href="route('referees.index')"
+                    :current="request()->routeIs('referees.index')" wire:navigate
+                    class="{{ $baseLink }} {{ request()->routeIs('referees.index') ? '!text-white !font-semibold' : '' }}">
+                    {{ __('Referees') }}
+                </flux:navbar.item>
+            @endcan
+
+            @endhasanyrole
+        </flux:navbar>
+
+        <flux:spacer />
+
+        <flux:navbar class=" me-1.5 space-x-0.5 rtl:space-x-reverse py-0!">
+            <flux:tooltip :content="__('Notifications')" position="bottom">
+                <flux:navbar.item class="h-10 max-lg:hidden [&>div>svg]:size-5" icon="bell" href="#" target="_blank"
+                    label="Notifications"
+                    class="{{ $baseLink }} {{ request()->routeIs('admin.leagues.index') ? '!text-white !font-semibold' : '' }}" />
+            </flux:tooltip>
+            <livewire:language-switcher />
+>>>>>>> release/1.0.0
         </flux:navbar>
 
         <!-- Desktop User Menu -->
@@ -77,6 +148,7 @@
                 <flux:menu.separator />
 
                 <flux:menu.radio.group>
+<<<<<<< HEAD
                     <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}
                     </flux:menu.item>
                 </flux:menu.radio.group>
@@ -103,6 +175,47 @@
             <x-app-logo />
         </a>
 
+=======
+                    @hasanyrole('Owner|Administrator')
+                    @can('manage_users')
+                        <flux:menu.item icon="users" :href="route('admin.users.index')" wire:navigate>
+                            {{ __('Manage users') }}
+                        </flux:menu.item>
+                    @endcan
+
+                    @can('manage_leagues')
+                        <flux:menu.item icon="building-office" :href="route('admin.leagues.index')" wire:navigate>
+                            {{ __('Manage leagues') }}
+                        </flux:menu.item>
+                    @endcan
+                    @endhasanyrole
+                    <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}
+                    </flux:menu.item>
+                </flux:menu.radio.group>
+
+                <flux:menu.separator />
+
+                <form method="POST" action="{{ route('logout') }}" class="w-full">
+                    @csrf
+                    <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full"
+                        data-test="logout-button">
+                        {{ __('Log Out') }}
+                    </flux:menu.item>
+                </form>
+            </flux:menu>
+        </flux:dropdown>
+    </flux:header>
+
+    <!-- Mobile Menu -->
+    <flux:sidebar stashable sticky
+        class="lg:hidden border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+        <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
+
+        <a href="{{ route('dashboard') }}" class="ms-1 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
+            <x-app-logo />
+        </a>
+
+>>>>>>> release/1.0.0
         <flux:navlist variant="outline">
             <flux:navlist.group :heading="__('Platform')">
                 <flux:navlist.item icon="layout-grid" :href="route('dashboard')"

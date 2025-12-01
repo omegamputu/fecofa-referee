@@ -28,7 +28,7 @@ class PasswordResetCustom extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     /**
@@ -42,7 +42,7 @@ class PasswordResetCustom extends Notification
         ], false));
 
         return (new MailMessage)
-                ->subject("Reset Your Password")
+                ->subject("Réinitialisez votre mot de passe")
                 ->markdown('mail.user.password-reset', [
                     'user' => $notifiable,
                     'url' => $url,

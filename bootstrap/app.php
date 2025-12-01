@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\MustSetPassword;
+use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -21,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => PermissionMiddleware::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,
             'must_set_password' => MustSetPassword::class,
+            'set_locale'         => SetLocale::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -3,6 +3,7 @@
 namespace App\Actions\Users;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 
@@ -22,6 +23,8 @@ class CreateUser
             ]);
 
             $user->assignRole($role);
+
+            Cache::put("invite:{$user->email}", true, now()->addMinutes(2));
 
             // Envoi d’invitation via broker "invites"
             Password::broker('invites')->sendResetLink(['email' => $user->email]);
