@@ -37,29 +37,29 @@ Route::middleware(['auth', 'permission:admin_access', 'must_set_password'])
 
 ////////////////////
 /// Referee routes
-Route::middleware(['auth','must_set_password'])
-    ->group(function () {
+Route::middleware(['auth','must_set_password'])->group(function () {
         Volt::route('/referees/categories', 'referees.categories.index')
-            ->middleware(['permission:manage_referee_categories'])
-            ->name('referees.categories.index');
+            ->name('referees.categories.index')
+            ->middleware(['permission:manage_referee_categories']);
 
-        Volt::route('/referees', 'referees.index')
-            ->middleware(['permission:view_referee'])
-            ->name('referees.index');
+        Volt::route('/referees/list', 'referees.index')
+            ->name('referees.index')
+            ->middleware(['permission:view_referee']);
 
         Volt::route('/referees/create', 'referees.create')
-            ->middleware(['permission:create_referee'])
-            ->name('referees.create');
+            ->name('referees.create')
+            ->middleware(['permission:create_referee']);
 
         Volt::route('/referees/{referee}/edit', 'referees.edit')
-            ->middleware(['permission:edit_referee'])
             ->name('referees.edit')
-            ->whereNumber('referee');
-
-        Route::get('/referees/export', [ExportController::class, 'pdf'])
-            ->name('referees.export')
-            ->middleware(['auth', 'permission:export_referee_data']);
+            ->whereNumber('referee')
+            ->middleware(['permission:edit_referee']);
 });
+
+// Export referees PDF
+Route::get('/referees/export', [ExportController::class, 'pdf'])
+        ->name('referees.export')
+        ->middleware(['auth', 'permission:export_referee_data']);
 
 ////////////////////
 

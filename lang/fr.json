@@ -411,5 +411,7 @@
     "Invitation sent": "Invitation envoyée",
     "Last sent": "Dernier envoi",
     "Activate": "Activer",
-    "Deactivate": "Désactiver"
+    "Deactivate": "Désactiver",
+    "Set your password": "Définir votre mot de passe",
+    "Enter your password below to log in": "Saisissez votre mot de passe ci-dessous pour vous connecter."
 }

@@ -53,6 +53,15 @@
                 class="{{ $baseLink }} {{ request()->routeIs('dashboard') ? '!text-white !font-semibold' : '' }}">
                 {{ __('Dashboard') }}
             </flux:navbar.item>
+
+            @can('view_referee')
+                <flux:navbar.item icon="queue-list" :href="route('referees.index')"
+                    :current="request()->routeIs('referees.index')" wire:navigate
+                    class="{{ $baseLink }} {{ request()->routeIs('referees.index') ? '!text-white !font-semibold' : '' }}">
+                    {{ __('Referees') }}
+                </flux:navbar.item>
+            @endcan
+
             @endhasanyrole
         </flux:navbar>
 
