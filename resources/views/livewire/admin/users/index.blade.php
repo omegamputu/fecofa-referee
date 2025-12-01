@@ -251,12 +251,131 @@ new class extends Component {
                                 <flux:badge color="red">{{ __("Inactive") }}</flux:badge>
                             @endif
                         </td>
-
-                        <td class="px-6 py-4">
-                            {{-- Boutons propres --}}
-                            @include('admin.users.partials.actions', ['u' => $u])
+                        <td>
+                            <flux:modal.trigger name="edit-user-{{ $u->id }}">
+                                <flux:button wire:click="editUser({{ $u->id }})" :loading="false" size="sm"
+                                    class="cursor-pointer"> {{ __("Edit") }} </flux:button>
+                            </flux:modal.trigger>
+                            <flux:modal name="edit-user-{{ $u->id }}" class="md:w-96"
+                                wire:key="edit-user-modal-{{ $u->id }}" variant="flyout">
+                                <div class="space-y-6">
+                                    <div>
+                                        <flux:heading size="lg">{{ __("Edit user") }}</flux:heading>
+                                        <flux:text class="mt-2">{{ __("Update personal details.") }}</flux:text>
+                                    </div>
+                                    <flux:input label="{{ __('Name') }}" wire:model.defer="editName" type="text"
+                                        placeholder="Your name" />
+                                    <flux:input label="{{ __('Email') }}" wire:model.defer="editEmail" type="email"
+                                        placeholder="Your email" />
+                                    <flux:select wire:model="selectedRole" label="Role"
+                                        placeholder="{{ __('Select role') }}">
+                                        @foreach ($roles as $role) <flux:select.option class="text-zinc-400"
+                                        value="{{ $role }}">{{ ucfirst($role) }} </flux:select.option> @endforeach
+                                    </flux:select>
+                                    <div class="flex gap-2">
+                                        <flux:modal.close>
+                                            <flux:button variant="ghost" type="button" class="cursor-pointer">
+                                                {{ __("Cancel") }}
+                                            </flux:button>
+                                        </flux:modal.close>
+                                        <flux:modal.close>
+                                            <flux:button wire:click="updateUser" type="button" variant="primary"
+                                                color="green" class="cursor-pointer"> {{ __("Update") }} </flux:button>
+                                        </flux:modal.close>
+                                    </div>
+                                    <flux:separator text="or" />
+                                    <div class="text-sm text-zinc-500 dark:text-zinc-300"> <span class="font-semibold mb-3">
+                                            {{ __("Invitation sent") }} </span> : {{ $u->invitation_sent_count ?? 0 }} </br>
+                                        @if($u->invited_at) <span class="font-semibold">{{ __("Last sent") }}</span> :
+                                        {{ optional($u->invited_at)->format('d/m/Y H:i') }} @endif
+                                    </div>
+                                </div>
+                            </flux:modal>
+                            <flux:modal.trigger name="resent-invitation-user-{{ $u->id }}">
+                                <flux:button variant="primary" color="blue" :loading="false" size="sm"
+                                    class="ms-1 cursor-pointer"> {{ __("Resend Invitation") }} </flux:button>
+                            </flux:modal.trigger>
+                            <flux:modal name="resent-invitation-user-{{ $u->id }}" class="md:w-96">
+                                <div class="space-y-6">
+                                    <div>
+                                        <flux:heading size="lg">{{ __("Resend Invitation") }}</flux:heading>
+                                        <flux:text class="mt-2">
+                                            {{ __("Are you sure you want to resend the invitation to this user?") }}
+                                        </flux:text>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <flux:spacer />
+                                        <flux:modal.close>
+                                            <flux:button variant="ghost" type="button" class="cursor-pointer">
+                                                {{ __("Cancel") }}
+                                            </flux:button>
+                                        </flux:modal.close>
+                                        <flux:modal.close>
+                                            <flux:button wire:click="resendInvitation({{ $u->id }})" type="button"
+                                                variant="primary" color="green" class="cursor-pointer"> {{ __("Confirm") }}
+                                            </flux:button>
+                                        </flux:modal.close>
+                                    </div>
+                                </div>
+                            </flux:modal>
+                            <flux:modal.trigger name="toggle-active-user-{{ $u->id }}">
+                                <flux:button variant="{{ $u->is_active ? 'primary' : 'primary' }}"
+                                    color="{{ $u->is_active ? 'orange' : 'emerald' }}" :loading="false" size="sm"
+                                    class="cursor-pointer ms-1"> @if ($u->is_active) {{ __("Deactivate") }} @else
+                                    {{ __("Activate") }} @endif
+                                </flux:button>
+                            </flux:modal.trigger>
+                            <flux:modal name="toggle-active-user-{{ $u->id }}" class="md:w-96">
+                                <div class="space-y-6">
+                                    <div>
+                                        <flux:heading size="lg">{{ $u->is_active ? 'Deactivate' : 'Activate' }} user
+                                        </flux:heading>
+                                        <flux:text class="mt-2">Are you sure you want to
+                                            {{ $u->is_active ? 'deactivate' : 'activate' }} this user?
+                                        </flux:text>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <flux:spacer />
+                                        <flux:modal.close>
+                                            <flux:button variant="ghost" type="button" class="cursor-pointer">
+                                                {{ __("Cancel") }}
+                                            </flux:button>
+                                        </flux:modal.close>
+                                        <flux:modal.close>
+                                            <flux:button wire:click="toggleActive({{ $u->id }})" type="button"
+                                                variant="primary" color="green" class="cursor-pointer"> {{ __("Confirm") }}
+                                            </flux:button>
+                                        </flux:modal.close>
+                                    </div>
+                                </div>
+                            </flux:modal>
+                            <flux:modal.trigger name="delete-user-{{ $u->id }}">
+                                <flux:button variant="danger" :loading="false" size="sm"
+                                    class="text-red-600 cursor-pointer ms-1"> {{ __("Delete") }} </flux:button>
+                            </flux:modal.trigger>
+                            <flux:modal name="delete-user-{{ $u->id }}" class="md:w-96">
+                                <div class="space-y-6">
+                                    <div>
+                                        <flux:heading size="lg">{{ __("Delete user") }}</flux:heading>
+                                        <flux:text class="mt-2">
+                                            {{ __("Are you sure you want to delete this user? This action cannot be undone.") }}
+                                        </flux:text>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <flux:spacer />
+                                        <flux:modal.close>
+                                            <flux:button variant="ghost" type="button" class="cursor-pointer">
+                                                {{ __("Cancel") }}
+                                            </flux:button>
+                                        </flux:modal.close>
+                                        <flux:modal.close>
+                                            <flux:button wire:click="delete({{ $u->id }})" type="button" variant="danger"
+                                                color="green" class="cursor-pointer"> {{ __("Confirm") }} </flux:button>
+                                        </flux:modal.close>
+                                    </div>
+                                </div>
+                            </flux:modal>
                         </td>
-
                     </tr>
                 @endforeach
             </tbody>
