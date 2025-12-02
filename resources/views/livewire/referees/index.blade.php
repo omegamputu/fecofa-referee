@@ -190,7 +190,7 @@ new class extends Component {
                                         {{ $referee->last_name }} {{ $referee->first_name }}
                                     </div>
                                     <div class="text-xs text-neutral-400">
-                                        {{ ucfirst($referee->gender ?? '')}},
+                                        {{ ucfirst(__($referee->gender) ?? '')}},
                                         {{ optional($referee->date_of_birth)->format('d/m/Y') }}
                                         – {{ $referee->refereeRole?->name }}
                                     </div>

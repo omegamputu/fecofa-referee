@@ -73,9 +73,13 @@ Route::middleware(['auth','must_set_password'])->group(function () {
             ->middleware(['permission:edit_referee']);
 });
 
-// Export referees PDF
-Route::get('/referees/export', [ExportController::class, 'pdf'])
+// Export PDF
+Route::get('/referees/export', [ExportController::class, 'refereeExportPdf'])
         ->name('referees.export')
+        ->middleware(['auth', 'permission:export_referee_data']);
+
+Route::get('/instructors/export', [ExportController::class, 'instructorExportPdf'])
+        ->name('instructors.export')
         ->middleware(['auth', 'permission:export_referee_data']);
 
 ////////////////////

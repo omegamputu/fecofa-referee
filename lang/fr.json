@@ -442,5 +442,7 @@
     "Add instructor": "Ajouter un instructeur",
     "Edit instructor": "Modifier l'instructeur",
     "Instructor Information": "Informations sur l'instructeur",
-    "Fill in the instructor personal details, role and function.": "Remplissez les détails personnels de l'instructeur, le rôle et la fonction."
+    "Fill in the instructor personal details, role and function.": "Remplissez les détails personnels de l'instructeur, le rôle et la fonction.",
+    "male": "homme",
+    "female": "femme"
 }

@@ -271,8 +271,8 @@ new class extends Component {
 
                                 <flux:select label="{{ __('Gender') }}" wire:model.defer="gender" class="mb-2" required>
                                     <flux:select.option value="">{{ __('Select gender') }}</flux:select.option>
-                                    <flux:select.option value="male">{{ __('Male') }}</flux:select.option>
-                                    <flux:select.option value="female">{{ __('Female') }}</flux:select.option>
+                                    <flux:select.option value="male">{{ ucfirst(__('male')) }}</flux:select.option>
+                                    <flux:select.option value="female">{{ ucfirst(__('female')) }}</flux:select.option>
                                 </flux:select>
                             </div>
 

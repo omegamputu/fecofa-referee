@@ -101,7 +101,7 @@ new class extends Component {
         @endcan
 
         @can('export_referee_data')
-                <a href="{{ route('referees.export', [
+                <a href="{{ route('instructors.export', [
                 'search' => $search ?? null,
                 'league' => $leagueFilter ?? null,
                 'role' => $roleFilter ?? null,
