@@ -430,5 +430,17 @@
     "Number of referees": "Nombre d'arbitres",
     "Breakdown by league": "Répartition par ligue",
     "Reset Your Password": "Réinitialisez votre mot de passe",
-    "You are invited to set your password": "Vous êtes invité à définir votre mot de passe"
+    "You are invited to set your password": "Vous êtes invité à définir votre mot de passe",
+    "Instructors": "Instructeurs",
+    "All functions": "Toutes les fonctions",
+    "Roles": "Rôles",
+    "Mobile number": "Numéro de portable",
+    "Level of referee": "Niveau d'arbitrage",
+    "Role of referee": "Rôle de l'arbitre",
+    "Year of birth": "Année de naissance",
+    "Instructor since": "Instructeur depuis",
+    "Add instructor": "Ajouter un instructeur",
+    "Edit instructor": "Modifier l'instructeur",
+    "Instructor Information": "Informations sur l'instructeur",
+    "Fill in the instructor personal details, role and function.": "Remplissez les détails personnels de l'instructeur, le rôle et la fonction."
 }

@@ -2,8 +2,12 @@
 
 namespace App\Models\Instructors;
 
+use App\Models\Referees\IdentityDocument;
+use App\Models\Referees\RefereeCategory;
+use App\Models\Referees\RefereeRole;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Instructor extends Model
 {
@@ -14,7 +18,7 @@ class Instructor extends Model
         'referee_role_id',
         'last_name',
         'first_name',
-        'date_of_birth',
+        'year_of_birth',
         'gender',
         'phone',
         'email',
@@ -26,8 +30,23 @@ class Instructor extends Model
         'profile_photo_path',
     ];
 
-    public function roleName(): BelongsTo
+    public function instructorRole(): BelongsTo
     {
         return $this->belongsTo(InstructorRole::class);
+    }
+
+    public function refereeCategory(): BelongsTo
+    {
+        return $this->belongsTo(RefereeCategory::class, 'referee_category_id');
+    }
+
+    public function refereeRole(): BelongsTo
+    {
+        return $this->belongsTo(RefereeRole::class, 'referee_role_id');
+    }
+
+    public function identityDocument(): HasOne
+    {
+        return $this->hasOne(IdentityDocument::class);
     }
 }

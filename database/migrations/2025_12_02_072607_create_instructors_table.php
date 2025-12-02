@@ -31,7 +31,7 @@ return new class extends Migration
             // Infos perso
             $table->string('last_name');          // NOM
             $table->string('first_name');         // Prénoms
-            $table->date('date_of_birth')->nullable();
+            $table->year('year_of_birth')->nullable();
             $table->enum('gender', ['male', 'female'])->nullable();
             // Contact
             $table->string('phone')->nullable();
