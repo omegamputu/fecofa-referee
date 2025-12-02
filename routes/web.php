@@ -40,6 +40,18 @@ Route::middleware(['auth', 'permission:admin_access', 'must_set_password'])
         Volt::route('/leagues', 'admin.leagues.index')->name('leagues.index');
 });
 
+Route::middleware(['auth','must_set_password'])->group(function () {
+    Volt::route('/instructors/roles', 'instructors.roles')->name('instructors.roles');
+    Volt::route('/instructors/list', 'instructors.index')->name('instructors.index');
+    Volt::route('/instructors/create', 'instructors.create')
+            ->name('instructors.create');
+            //->middleware(['permission:create_referee']);
+
+        Volt::route('/instructors/{instructor}/edit', 'instructors.edit')
+            ->name('instructors.edit')
+            ->whereNumber('referee');
+            //->middleware(['permission:edit_referee']);
+});
 ////////////////////
 /// Referee routes
 Route::middleware(['auth','must_set_password'])->group(function () {

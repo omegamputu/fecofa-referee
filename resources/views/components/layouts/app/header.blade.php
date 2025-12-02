@@ -46,13 +46,19 @@
             @endcan
 
             @can('manage_referee_categories')
-                <flux:navbar.item icon="academic-cap" :href="route('referees.categories.index')"
+                <flux:navbar.item icon="rectangle-group" :href="route('referees.categories.index')"
                     :current="request()->routeIs('referees.categories.index')" wire:navigate
                     class="{{ $baseLink }} {{ request()->routeIs('referees.categories.index') ? '!text-white !font-semibold' : '' }}">
                     {{ __('Categories') }}
                 </flux:navbar.item>
             @endcan
             @endhasanyrole
+
+            <flux:navbar.item icon="academic-cap" :href="route('instructors.index')"
+                :current="request()->routeIs('instructors.index')" wire:navigate
+                class="{{ $baseLink }} {{ request()->routeIs('instructors.index') ? '!text-white !font-semibold' : '' }}">
+                {{ __('Instructors') }}
+            </flux:navbar.item>
 
             {{-- MEMBER & VIEWER --}}
             @hasanyrole('Member|Viewer')
