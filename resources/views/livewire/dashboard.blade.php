@@ -62,7 +62,7 @@ new class extends Component {
 ?>
 
 <div>
-    <div class="container mx-auto h-full w-full max-w-5xl px-6">
+    <div class="container mx-auto h-full w-full max-w-7xl px-6">
         {{-- Titre --}}
         <header class="mb-6 flex items-center justify-between">
             <div>
@@ -139,17 +139,17 @@ new class extends Component {
                             <tbody class="divide-y">
                                 @foreach($lastReferees as $referee)
                                     <tr>
-                                        <td class="py-2 text-xs">{{ $referee->person_id }}</td>
-                                        <td class="py-2 text-xs">
+                                        <td class="py-2">{{ $referee->person_id }}</td>
+                                        <td class="py-2">
                                             {{ $referee->last_name }} {{ $referee->first_name }}
                                         </td>
-                                        <td class="py-2 text-xs">
+                                        <td class="py-2">
                                             {{ $referee->league?->code ?? '—' }}
                                         </td>
-                                        <td class="py-2 text-xs">
+                                        <td class="py-2">
                                             {{ ucfirst($referee->refereeCategory?->name) }}
                                         </td>
-                                        <td class="py-2 text-xs">
+                                        <td class="py-2">
                                             {{ $referee->created_at->format('d/m/Y') }}
                                         </td>
                                     </tr>
