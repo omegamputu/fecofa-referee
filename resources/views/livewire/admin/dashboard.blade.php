@@ -89,7 +89,7 @@ new class extends Component {
 ?>
 
 <div>
-    <div class="container mx-auto h-full w-full max-w-7xl px-6">
+    <div class="container mx-auto h-full w-full max-w-5xl px-6">
         {{-- Titre --}}
         <header class="mb-6 flex items-center justify-between">
             <div>
@@ -166,17 +166,17 @@ new class extends Component {
                             <tbody class="divide-y">
                                 @foreach($lastReferees as $referee)
                                     <tr>
-                                        <td class="py-2">{{ $referee->person_id }}</td>
-                                        <td class="py-2">
+                                        <td class="py-2 text-xs">{{ $referee->person_id }}</td>
+                                        <td class="py-2 text-xs">
                                             {{ $referee->last_name }} {{ $referee->first_name }}
                                         </td>
-                                        <td class="py-2">
+                                        <td class="py-2 text-xs">
                                             {{ $referee->league?->code ?? '—' }}
                                         </td>
-                                        <td class="py-2">
+                                        <td class="py-2 text-xs">
                                             {{ ucfirst($referee->refereeCategory?->name) }}
                                         </td>
-                                        <td class="py-2">
+                                        <td class="py-2 text-xs">
                                             {{ $referee->created_at->format('d/m/Y') }}
                                         </td>
                                     </tr>
@@ -217,14 +217,14 @@ new class extends Component {
                             <tbody class="divide-y">
                                 @foreach($soonExpiringDocs as $doc)
                                     <tr>
-                                        <td class="py-2">
+                                        <td class="py-2 text-xs">
                                             {{ $doc->referee?->last_name }}
                                             {{ $doc->referee?->first_name }}
                                         </td>
-                                        <td class="py-2">
+                                        <td class="py-2 text-xs">
                                             {{ ucfirst(str_replace('_', ' ', $doc->type)) }}
                                         </td>
-                                        <td class="py-2">
+                                        <td class="py-2 text-xs">
                                             {{ \Illuminate\Support\Carbon::parse($doc->expiry_date)->format('d/m/Y') }}
                                         </td>
                                     </tr>
@@ -258,8 +258,8 @@ new class extends Component {
                         <tbody class="divide-y">
                             @foreach($byCategory as $row)
                                 <tr>
-                                    <td class="py-2">{{ ucfirst($row->refereeCategory?->name) }}</td>
-                                    <td class="py-2">{{ $row->total }}</td>
+                                    <td class="py-2 text-xs">{{ ucfirst($row->refereeCategory?->name) }}</td>
+                                    <td class="py-2 text-xs">{{ $row->total }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -288,10 +288,10 @@ new class extends Component {
                         <tbody class="divide-y">
                             @foreach($byLeague as $row)
                                 <tr>
-                                    <td class="py-2">
+                                    <td class="py-2 text-xs">
                                         {{ $row->league?->code }}
                                     </td>
-                                    <td class="py-2">
+                                    <td class="py-2 text-xs">
                                         {{ $row->total }}
                                     </td>
                                 </tr>

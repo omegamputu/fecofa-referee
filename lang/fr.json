@@ -447,5 +447,11 @@
     "female": "femme",
     "Manage users": "Gérer les utilisateurs",
     "Manage leagues": "Gérer les ligues",
-    "Roles and permissions": "Rôles et permissions"
+    "Roles and permissions": "Rôles et permissions",
+    "Create Permission": "Créer une permission",
+    "Permissions assigned": "Permissions attribuées",
+    "Add permission": "Ajouter une permission",
+    "No permissions assigned.": "Aucune permission attribuée.",
+    "Permission name": "Nom de la permission",
+    "Edit Role": "Modifier le rôle"
 }
