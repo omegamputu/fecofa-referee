@@ -21,12 +21,8 @@ Route::get('/lang/{lang}', function ($lang) {
 
 Volt::route('/invite/accept/{token}', InviteSetPassword::class)->name('invite.accept');
 
-//Route::view('dashboard', 'dashboard')
-//    ->middleware(['auth', 'verified', 'must_set_password'])
-//    ->name('dashboard');
-
 Route::middleware(['auth', 'verified' ,'must_set_password'])->group(function () {
-    Volt::route('/dashboard', componentName: 'dashboard')
+    Volt::route('/dashboard', 'dashboard')
         ->name('dashboard');
 });
 
@@ -46,13 +42,13 @@ Route::middleware(['auth','must_set_password'])->group(function () {
     Volt::route('/instructors/roles', 'instructors.roles')->name('instructors.roles');
     Volt::route('/instructors/list', 'instructors.index')->name('instructors.index');
     Volt::route('/instructors/create', 'instructors.create')
-            ->name('instructors.create');
-            //->middleware(['permission:create_referee']);
+            ->name('instructors.create')
+            ->middleware(['permission:create_referee']);
 
         Volt::route('/instructors/{instructor}/edit', 'instructors.edit')
             ->name('instructors.edit')
-            ->whereNumber('referee');
-            //->middleware(['permission:edit_referee']);
+            ->whereNumber('referee')
+            ->middleware(['permission:edit_instructor']);
 });
 ////////////////////
 /// Referee routes
