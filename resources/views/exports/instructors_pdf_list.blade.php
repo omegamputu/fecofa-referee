@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Liste officielle des arbitres - FECOFA</title>
+    <title>Liste officielle des instructeurs - FECOFA</title>
 
     <style>
         @page {
@@ -155,7 +155,7 @@
                         Fédération Congolaise de Football Association (FECOFA)
                     </div>
                     <div class="header-title-small">
-                        Département de l'Arbitrage – Base de données des arbitres
+                        Département de l'Arbitrage – Base de données des instructeurs
                     </div>
                 </td>
                 <td class="logo-right">
@@ -178,65 +178,63 @@
         </table>
     </div>
 
-
-
     <main>
         <table>
             <thead>
                 <tr>
                     <th class="small">#</th>
-                    <th class="small text-left">Person ID</th>
                     <th class="small text-left">Nom</th>
-                    <th class="small">Ligue</th>
-                    <th class="small">Date de naissance</th>
-                    <th class="small">Catégorie</th>
+                    <th class="small">Année de naissance</th>
+                    <th class="small">Genre</th>
+                    <th class="small">Email</th>
+                    <th class="small">Téléphone</th>
+                    <th class="small">Instructeur depuis</th>
                     <th class="small">Rôle</th>
-                    <th class="small">Année début</th>
                     <th class="small">Status</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($referees as $index => $ref)
+                @foreach($instructors as $index => $instructor)
                     @php
-                        $status = $ref->status ?? 'active';
+                        $status = $instructor->status ?? 'active';
                     @endphp
                     <tr>
                         {{-- # --}}
                         <td class="center small">{{ $index + 1 }}</td>
 
-                        {{-- Person ID --}}
-                        <td class="small">{{ $ref->person_id }}</td>
-
                         {{-- Nom complet --}}
                         <td class="small">
-                            {{ mb_strtoupper($ref->last_name) }}
+                            {{ mb_strtoupper($instructor->last_name) }}
                             {{ ' ' }}
-                            {{ ucfirst(strtolower($ref->first_name)) }}
+                            {{ ucfirst(strtolower($instructor->first_name)) }}
                         </td>
 
                         {{-- Ligue --}}
                         <td class="center small">
-                            {{ $ref->league?->code ?? '' }}
+                            {{ $instructor->year_of_birth ?? '' }}
                         </td>
 
-                        {{-- Date de naissance --}}
+                        {{-- Gender --}}
                         <td class="center small">
-                            {{ optional($ref->date_of_birth)->format('d.m.Y') }}
+                            {{ $instructor->gender }}
                         </td>
 
-                        {{-- Catégorie --}}
+                        {{-- Contact --}}
                         <td class="center small">
-                            {{ ucfirst($ref->refereeCategory?->name ?? '') }}
+                            {{ $instructor->email }}
+                        </td>
+
+                        <td class="center small">
+                            {{ $instructor->phone }}
+                        </td>
+                        {{-- Année début --}}
+                        <td class="center small">
+                            {{ $instructor->start_year ?? '' }}
                         </td>
 
                         {{-- Rôle --}}
                         <td class="center small">
-                            {{ $ref->refereeRole?->name ?? '' }}
-                        </td>
-
-                        {{-- Année début --}}
-                        <td class="center small">
-                            {{ $ref->start_year ?? '' }}
+                            {{ ucfirst($instructor->instructorRole?->name ?? '') }}
                         </td>
 
                         {{-- Status --}}

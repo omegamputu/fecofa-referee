@@ -20,5 +20,6 @@ class DatabaseSeeder extends Seeder
         $this->call(LeagueSeeder::class);
         $this->call(RefereeCategorySeeder::class);
         $this->call(RefereeRoleSeeder::class);
+        //$this->call(RefereeSeeder::class);
     }
 }

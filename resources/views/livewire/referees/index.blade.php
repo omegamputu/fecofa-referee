@@ -69,7 +69,7 @@ new class extends Component {
             ->when(filled($this->categoryFilter), function ($q) {
                 $q->where('referee_category_id', $this->categoryFilter);
             })
-            ->orderBy('id', 'asc');
+            ->orderBy('id', 'desc');
 
         return [
             'referees' => $query->paginate(15),
@@ -94,7 +94,7 @@ new class extends Component {
 
 ?>
 
-<section class="container mx-auto h-full w-full max-w-7xl px-6">
+<section class="container mx-auto h-full w-full max-w-5xl px-6">
     <x-auth-session-status class="mb-4 text-center" :status="session('status')" />
 
     <div class="flex items-center justify-between mb-6 gap-4">
@@ -190,7 +190,7 @@ new class extends Component {
                                         {{ $referee->last_name }} {{ $referee->first_name }}
                                     </div>
                                     <div class="text-xs text-neutral-400">
-                                        {{ ucfirst($referee->gender ?? '')}},
+                                        {{ ucfirst(__($referee->gender) ?? '')}},
                                         {{ optional($referee->date_of_birth)->format('d/m/Y') }}
                                         – {{ $referee->refereeRole?->name }}
                                     </div>

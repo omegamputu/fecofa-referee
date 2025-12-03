@@ -2,10 +2,10 @@
 
 use Livewire\Volt\Component;
 use Illuminate\Support\Facades\DB;
-use App\Models\League;
 use App\Models\Referees\RefereeRole;
-use App\Models\Referees\Referee;
+use App\Models\Instructors\Instructor;
 use App\Models\Referees\RefereeCategory;
+use App\Models\Instructors\InstructorRole;
 use Livewire\WithFileUploads;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
@@ -14,26 +14,29 @@ new class extends Component {
     use WithFileUploads;
 
     // Champs du formulaire
+    public ?int $referee_category_id = null; // Category of the referee
+    public ?int $referee_role_id = null; // Function of the referee
+    public ?int $instructor_role_id = null; // Role of the instructor
+
     public string $last_name = '';
     public string $first_name = '';
-    public ?string $date_of_birth = null;
+    public ?string $year_of_birth = null;
     public ?string $gender = null;
-    public ?string $education_level = null;
-    public ?string $profession = null;
 
     public ?string $phone = null;
     public ?string $email = null;
     public ?string $address = null;
 
+    public ?string $profession = null;
+
+    public ?string $education_level = null;
+
+    public ?int $start_year = null; // Year the referee started
+
     public ?string $identity_type = null;
     public ?string $number = null;
     public ?string $issue_date = null;
     public ?string $expiry_date = null;
-
-    public ?int $league_id = null;
-    public ?int $start_year = null;
-    public ?int $referee_category_id = null; // Category of the referee
-    public ?int $referee_role_id = null; // Function of the referee
 
     // Upload photo
     public $profile_photo = null;
@@ -43,24 +46,12 @@ new class extends Component {
     public function with(): array
     {
         return [
-            'leagues' => League::select('id', 'code', 'name')->orderBy('code')->get()->toArray(),
             'categories' => RefereeCategory::select('id', 'name')->orderBy('id')->get()->toArray(),
             'roles' => RefereeRole::select('id', 'name')->orderBy('name')->get()->toArray(),
+            'instructor_roles' => InstructorRole::select('id', 'name')->orderBy('name')->get()->toArray(),
         ];
     }
 
-    public function updatedStartYear($value): void
-    {
-        if ($value && is_numeric($value)) {
-            $year = intval($value);
-
-            if ($year >= 1980 && $year <= now()->year + 1) {
-                $this->referee_start_year = $year;
-            } else {
-                $this->addError('start_year', __('Invalid year'));
-            }
-        }
-    }
 
     // Preview de la photo quand on choisit un fichier
     public function updatedProfilePhoto(): void
@@ -80,10 +71,11 @@ new class extends Component {
 
         // 👉 Dossier exact souhaité
         return $this->profile_photo->store(
-            'referees/profile_photos', // <— sous-dossier ici
+            'instructors/profile_photos', // <— sous-dossier ici
             'public'                   // disk "public"
         );
     }
+
 
     // Règles de validation
     public function rules(): array
@@ -91,7 +83,7 @@ new class extends Component {
         return [
             'last_name' => ['required', 'string', 'max:255'],
             'first_name' => ['required', 'string', 'max:255'],
-            'date_of_birth' => ['nullable', 'date'],
+            'year_of_birth' => ['nullable', 'integer', 'min:1960', 'max:' . date('Y')],
             'gender' => ['required', Rule::in(['male', 'female'])],
             'education_level' => ['nullable', 'string', 'max:255'],
             'profession' => ['nullable', 'string', 'max:255'],
@@ -119,10 +111,10 @@ new class extends Component {
                 'after_or_equal:issue_date',
             ],
 
-            'league_id' => ['required', 'exists:leagues,id'],
             'start_year' => ['nullable', 'integer', 'min:1980', 'max:' . date('Y')],
             'referee_category_id' => ['required', 'exists:referee_categories,id'],
             'referee_role_id' => ['required', 'exists:referee_roles,id'],
+            'instructor_role_id' => ['required', 'exists:instructor_roles,id'],
 
             'profile_photo' => ['nullable', 'image', 'max:2048'], // 2 Mo
         ];
@@ -133,104 +125,43 @@ new class extends Component {
         //1. Validation des datas
         $data = $this->validate();
 
-        // 2. Récupérer la ligue du referee
-        $league = League::findOrFail($data['league_id']);
-
         // On aura besoin de $referee après la transaction
-        $referee = null;
+        $instructor = null;
 
         // 3. Transaction
-        DB::transaction(function () use ($data, $league, &$referee) {
-
-            $personId = $this->generateRefereeId($league);
-
-            // 3.5 Filet de sécurité supplémentaire (au cas où)
-            if (Referee::where('person_id', $personId)->exists()) {
-                // Ici on peut relancer une exception => rollback automatique
-                throw new \RuntimeException("Duplicate referee_id generated: {$personId}");
-            }
+        DB::transaction(function () use ($data, &$instructor) {
 
             // 3.6 Upload de la photo éventuelle
             $photoPath = null;
             if ($this->profile_photo) {
                 $photoPath = $this->uploadProfilePhoto();
             }
-
-            $startYear = $this->updatedStartYear($data['start_year']);
             // 
 
-            // 3.7 Création de l’arbitre
-            $referee = Referee::create([
-                'league_id' => $data['league_id'],
+            // 
+            $instructor = Instructor::create([
+                'instructor_role_id' => $data['instructor_role_id'],
                 'referee_role_id' => $data['referee_role_id'],
-                'person_id' => $personId,
+                'referee_category_id' => $data['referee_category_id'],
                 'last_name' => $data['last_name'],
                 'first_name' => $data['first_name'],
-                'date_of_birth' => $data['date_of_birth'],
+                'year_of_birth' => $data['year_of_birth'],
                 'gender' => $data['gender'],
                 'phone' => $data['phone'],
                 'email' => $data['email'],
                 'address' => $data['address'],
                 'education_level' => $data['education_level'],
                 'profession' => $data['profession'],
-                'start_year' => $startYear,
-                'referee_category_id' => $data['referee_category_id'],
+                'start_year' => $data['start_year'],
                 'profile_photo_path' => $photoPath,
             ]);
-
-            // 3.8 Création du document d’identité lié
-            if ($this->identity_type) {
-                $payload = [
-                    'type' => $this->identity_type,
-                    'number' => $this->number,
-                    'issue_date' => $this->issue_date ?: null,
-                    'expiry_date' => $this->expiry_date ?: null,
-                ];
-
-                // updateOrCreate sur la relation hasOne
-                $referee->identityDocument()
-                    ->updateOrCreate(
-                        ['referee_id' => $referee->id],
-                        $payload
-                    );
-            } else {
-                // Si aucun type sélectionné, on supprime le document éventuel
-                $referee->identityDocument()->delete();
-            }
         });
 
         // Petit flash + redirection vers la liste
-        session()->flash('status', __('Referee created successfully.'));
+        session()->flash('status', __('Instructor created successfully.'));
 
-        $this->redirectRoute('referees.index');
+        $this->redirectRoute('instructors.index');
     }
-
-    public function generateRefereeId(League $league): string
-    {
-        // Verrouiller les lignes des arbitres de cette ligue
-        $lastReferee = Referee::where('league_id', $league->id)
-            ->lockForUpdate()        // important : doit être dans DB::transaction
-            ->orderByDesc('id')
-            ->first();
-
-        // Calcul du numéro séquentiel
-        $number = 1;
-
-        if ($lastReferee && $lastReferee->person_id) {
-            $parts = explode('-', $lastReferee->person_id);
-            // On prend la partie après le tiret, si elle existe
-            if (count($parts) > 1) {
-                $number = intval($parts[1]) + 1;
-            }
-        }
-
-        // Formatage sur 6 chiffres
-        $formattedNumber = str_pad($number, 6, '0', STR_PAD_LEFT);
-
-        // Final ID : LIFKIN-000123, etc.
-        return "{$league->code}-{$formattedNumber}";
-    }
-
 
 }
 
@@ -243,9 +174,9 @@ new class extends Component {
 
         <!-- Title -->
         <header class="mb-6">
-            <h1 class="text-3xl font-semibold text-neutral-900 dark:text-neutral-400">{{ __("Add referee") }}</h1>
+            <h1 class="text-3xl font-semibold text-neutral-900 dark:text-neutral-400">{{ __("Add instructor") }}</h1>
             <p class="mt-1 text-sm text-neutral-500">
-                {{ __("Fill in the referee personal details, league and function.") }}
+                {{ __("Fill in the instructor personal details, role and function.") }}
             </p>
         </header>
 
@@ -253,21 +184,21 @@ new class extends Component {
             <div class="flex flex-col col-span-2 gap-4 mb-6">
                 <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-700 w-full p-6 rounded-xl">
                     <h2 class="text-xl font-semibold dark:text-slate-400 mb-4">
-                        {{ __("Referee Information") }}
+                        {{ __("Instructor Information") }}
                     </h2>
 
                     <div class="flex flex-row gap-2">
                         <div class="w-full">
                             <div class="flex flex-row gap-4 mb-4">
-                                <flux:input label="{{ __('Last name') }}" wire:model.defer="last_name"
-                                    placeholder="NDALA NGAMBO" class="mb-2" required />
+                                <flux:input label="{{ __('Last name') }}" wire:model.defer="last_name" placeholder="DOE"
+                                    class="mb-2" required />
                                 <flux:input label="{{ __('First name') }}" wire:model.defer="first_name" class="mb-2"
-                                    placeholder="Jean-Jacques" required />
+                                    placeholder="JOHN" required />
                             </div>
 
                             <div class="flex flex-row gap-4 mb-4">
-                                <flux:input type="date" label="{{ __('Date of birth') }}"
-                                    wire:model.defer="date_of_birth" class="mb-2" />
+                                <flux:input type="number" label="{{ __('Year of birth') }}"
+                                    wire:model.defer="year_of_birth" placeholder="Ex: 1964" class="mb-2" />
 
                                 <flux:select label="{{ __('Gender') }}" wire:model.defer="gender" class="mb-2" required>
                                     <flux:select.option value="">{{ __('Select gender') }}</flux:select.option>
@@ -292,9 +223,9 @@ new class extends Component {
                                     <img src="{{ $profile_photo_preview }}" class="h-12 w-12 rounded object-cover"
                                         alt="Photo preview">
                                 </div>
-                            @elseif(!empty($referee?->profile_photo_path ?? null))
-                                <img src="{{ asset('storage/' . $referee->profile_photo_path) }}"
-                                    class="h-12 w-12 rounded object-cover" alt="Referee photo">
+                            @elseif(!empty($instructor?->profile_photo_path ?? null))
+                                <img src="{{ asset('storage/' . $instructor->profile_photo_path) }}"
+                                    class="h-12 w-12 rounded object-cover" alt="instructor photo">
                             @else
                                 <div class="col-span-full">
                                     <label for="photo" class="block text-sm/6 font-medium text-white">Photo</label>
@@ -329,7 +260,7 @@ new class extends Component {
 
                     <div class="flex flex-col gap-2">
                         <div class="flex flex-row gap-4 mb-4">
-                            <flux:input type="tel" wire:model.defer="phone" label="{{ __('Phone number') }}"
+                            <flux:input type="tel" wire:model.defer="phone" label="{{ __('Mobile number') }}"
                                 placeholder="Ex: +243000000000" />
                             <flux:input type="email" wire:model.defer="email" label="{{ __('E-mail Address') }}"
                                 placeholder="Ex: johndoe@example.com" />
@@ -339,69 +270,31 @@ new class extends Component {
                         </div>
                     </div>
                 </div>
-
-                <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-700 w-full p-6 rounded-xl">
-                    <h2 class="text-xl font-semibold dark:text-slate-400 mb-4">
-                        {{ __("Identity Document") }}
-                    </h2>
-
-                    <div class="flex flex-row gap-2">
-                        <div class="w-full">
-                            <div class="flex flex-row gap-4 mb-4">
-                                <flux:select wire:model="identity_type" label="{{ __('Type of document') }}">
-                                    <flux:select.option value="">{{ __("Choose") }}</flux:select.option>
-                                    <flux:select.option value="passport">{{ __("Passport") }}</flux:select.option>
-                                    <flux:select.option value="national_id">{{ __("National ID") }}
-                                    </flux:select.option>
-                                    <flux:select.option value="other">{{ __('Other') }}</flux:select.option>
-                                </flux:select>
-
-                                <flux:input wire:model.defer="number" label="{{ __('Number') }}"
-                                    placeholder="Ex: P0000123" />
-
-                                <div x-data>
-                                    <div x-show="$wire.identity_type === 'passport'" x-transition>
-                                        <div class="flex flex-row gap-2">
-                                            <flux:input type="date" wire:model.defer="issue_date"
-                                                label="{{ __('Issue date') }}" />
-                                            <flux:input type="date" wire:model.defer="expiry_date"
-                                                label="{{ __('Expiry date') }}" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <div class="flex flex-col gap-4">
                 <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-700 p-6 rounded-xl">
                     <h2 class="text-xl font-semibold dark:text-slate-400 mb-4">
-                        {{ __("Affiliated league") }}
-                    </h2>
-                    <div>
-                        <flux:select wire:model.defer="league_id" class="mb-4" required>
-                            <flux:select.option value="">{{ __('Select league') }}</flux:select.option>
-                            @foreach($leagues as $league)
-                                <flux:select.option value="{{ $league['id'] }}">
-                                    {{ $league['code'] }} – {{ $league['name'] }}
-                                </flux:select.option>
-                            @endforeach
-                        </flux:select>
-
-                        @error('league_id')
-                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-                <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-700 p-6 rounded-xl">
-                    <h2 class="text-xl font-semibold dark:text-slate-400 mb-4">
-                        {{ __("Refereeing career") }}
+                        {{ __("Instructor since") }}
                     </h2>
 
                     <flux:input type="number" wire:model.defer="start_year" label="{{ __('Start year') }}" min="1980"
                         placeholder="Ex: 2008" class="mb-2" />
+
+                    <flux:select label="{{ __('Role') }}" wire:model.defer="instructor_role_id" class="mb-2" required>
+                        <flux:select.option value="">{{ __('Select role') }}</flux:select.option>
+                        @foreach ($instructor_roles as $item)
+                            <flux:select.option value="{{ $item['id'] }}">
+                                {{ $item['name'] }}
+                            </flux:select.option>
+                        @endforeach
+                    </flux:select>
+                </div>
+
+                <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-700 p-6 rounded-xl">
+                    <h2 class="text-xl font-semibold dark:text-slate-400 mb-4">
+                        {{ __("Refereeing career") }}
+                    </h2>
 
                     <flux:select label="{{ __('Category') }}" wire:model.defer="referee_category_id" class="mb-2"
                         required>
