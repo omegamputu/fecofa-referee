@@ -69,7 +69,7 @@ new class extends Component {
             ->when(filled($this->categoryFilter), function ($q) {
                 $q->where('referee_category_id', $this->categoryFilter);
             })
-            ->orderBy('id', 'asc');
+            ->orderBy('id', 'desc');
 
         return [
             'referees' => $query->paginate(15),

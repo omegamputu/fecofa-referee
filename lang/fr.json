@@ -444,5 +444,8 @@
     "Instructor Information": "Informations sur l'instructeur",
     "Fill in the instructor personal details, role and function.": "Remplissez les détails personnels de l'instructeur, le rôle et la fonction.",
     "male": "homme",
-    "female": "femme"
+    "female": "femme",
+    "Manage users": "Gérer les utilisateurs",
+    "Manage leagues": "Gérer les ligues",
+    "Roles and permissions": "Rôles et permissions"
 }

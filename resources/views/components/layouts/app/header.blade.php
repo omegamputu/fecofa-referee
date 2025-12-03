@@ -137,6 +137,10 @@
                     @endcan
                     @endhasanyrole
 
+                    <flux:menu.item icon="key" :href="route('admin.roles.index')" wire:navigate>
+                        {{ __('Roles and permissions') }}
+                    </flux:menu.item>
+
                     <flux:menu.item icon="cog" :href="route('profile.edit')" wire:navigate>
                         {{ __('Settings') }}
                     </flux:menu.item>
