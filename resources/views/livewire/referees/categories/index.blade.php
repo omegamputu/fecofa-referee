@@ -129,7 +129,7 @@ new class extends Component {
 ?>
 
 <div>
-    <section class="container mx-auto w-full max-w-5xl px-6">
+    <section class="container mx-auto w-full max-w-7xl px-6">
         <!-- Session Status -->
         <x-auth-session-status class="text-center" :status="session('status')" />
 
