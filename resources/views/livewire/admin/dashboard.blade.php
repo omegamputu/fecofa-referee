@@ -10,8 +10,35 @@ new class extends Component {
         // 1. Statistiques simples
         $totalReferees = Referee::count();
 
-        $international = Referee::where('referee_category_id', 'internationale')->count();
-        $national = Referee::where('referee_category_id', 'nationale')->count();
+        $international = DB::table('referee_categories')
+            // 1. On sélectionne les colonnes de base de la catégorie
+            ->select('id', 'name')
+            // 2. On injecte le compteur via une sous-requête
+            ->addSelect([
+                'nombre_arbitres' => function ($query) {
+                    $query->selectRaw('COUNT(*)')
+                        ->from('referees')
+                        ->whereColumn('referees.referee_category_id', 'referee_categories.id');
+                }
+            ])
+            // 2. On filtre pour ne récupérer que la catégorie "Internationale"
+            ->where('name', 'Internationale')
+            ->get();
+
+        $national = DB::table('referee_categories')
+            // 1. On sélectionne les colonnes de base de la catégorie
+            ->select('id', 'name')
+            // 2. On injecte le compteur via une sous-requête
+            ->addSelect([
+                'nombre_arbitres' => function ($query) {
+                    $query->selectRaw('COUNT(*)')
+                        ->from('referees')
+                        ->whereColumn('referees.referee_category_id', 'referee_categories.id');
+                }
+            ])
+            // 2. On filtre pour ne récupérer que la catégorie "Internationale"
+            ->where('name', 'Nationale')
+            ->get();
 
         $newThisMonth = Referee::whereYear('created_at', now()->year)
             ->whereMonth('created_at', now()->month)
@@ -62,7 +89,7 @@ new class extends Component {
 ?>
 
 <div>
-    <div class="container mx-auto h-full w-full max-w-7xl px-6">
+    <div class="container mx-auto h-full w-full max-w-5xl px-6">
         {{-- Titre --}}
         <header class="mb-6 flex items-center justify-between">
             <div>
@@ -99,12 +126,12 @@ new class extends Component {
 
             <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-600 rounded-xl p-4">
                 <p class="text-xs uppercase text-neutral-500">{{ __('International') }}</p>
-                <p class="mt-2 text-2xl font-semibold">{{ $international }}</p>
+                <p class="mt-2 text-2xl font-semibold">{{ $international->first()->nombre_arbitres }}</p>
             </div>
 
             <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-600 rounded-xl p-4">
                 <p class="text-xs uppercase text-neutral-500">{{ __('National') }}</p>
-                <p class="mt-2 text-2xl font-semibold">{{ $national }}</p>
+                <p class="mt-2 text-2xl font-semibold">{{ $national->first()->nombre_arbitres }}</p>
             </div>
 
             <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-600 rounded-xl p-4">
@@ -139,17 +166,17 @@ new class extends Component {
                             <tbody class="divide-y">
                                 @foreach($lastReferees as $referee)
                                     <tr>
-                                        <td class="py-2">{{ $referee->person_id }}</td>
-                                        <td class="py-2">
+                                        <td class="py-2 text-xs">{{ $referee->person_id }}</td>
+                                        <td class="py-2 text-xs">
                                             {{ $referee->last_name }} {{ $referee->first_name }}
                                         </td>
-                                        <td class="py-2">
+                                        <td class="py-2 text-xs">
                                             {{ $referee->league?->code ?? '—' }}
                                         </td>
-                                        <td class="py-2">
+                                        <td class="py-2 text-xs">
                                             {{ ucfirst($referee->refereeCategory?->name) }}
                                         </td>
-                                        <td class="py-2">
+                                        <td class="py-2 text-xs">
                                             {{ $referee->created_at->format('d/m/Y') }}
                                         </td>
                                     </tr>
@@ -190,14 +217,14 @@ new class extends Component {
                             <tbody class="divide-y">
                                 @foreach($soonExpiringDocs as $doc)
                                     <tr>
-                                        <td class="py-2">
+                                        <td class="py-2 text-xs">
                                             {{ $doc->referee?->last_name }}
                                             {{ $doc->referee?->first_name }}
                                         </td>
-                                        <td class="py-2">
+                                        <td class="py-2 text-xs">
                                             {{ ucfirst(str_replace('_', ' ', $doc->type)) }}
                                         </td>
-                                        <td class="py-2">
+                                        <td class="py-2 text-xs">
                                             {{ \Illuminate\Support\Carbon::parse($doc->expiry_date)->format('d/m/Y') }}
                                         </td>
                                     </tr>
@@ -231,8 +258,8 @@ new class extends Component {
                         <tbody class="divide-y">
                             @foreach($byCategory as $row)
                                 <tr>
-                                    <td class="py-2">{{ ucfirst($row->refereeCategory?->name) }}</td>
-                                    <td class="py-2">{{ $row->total }}</td>
+                                    <td class="py-2 text-xs">{{ ucfirst($row->refereeCategory?->name) }}</td>
+                                    <td class="py-2 text-xs">{{ $row->total }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -261,10 +288,10 @@ new class extends Component {
                         <tbody class="divide-y">
                             @foreach($byLeague as $row)
                                 <tr>
-                                    <td class="py-2">
+                                    <td class="py-2 text-xs">
                                         {{ $row->league?->code }}
                                     </td>
-                                    <td class="py-2">
+                                    <td class="py-2 text-xs">
                                         {{ $row->total }}
                                     </td>
                                 </tr>

@@ -38,6 +38,8 @@ Route::middleware(['auth', 'permission:admin_access', 'must_set_password'])
         //Volt::route('permissions', 'admin.permissions')->name('permissions.index');
         Volt::route('/users', 'admin.users.index')->name('users.index');
         Volt::route('/leagues', 'admin.leagues.index')->name('leagues.index');
+        Volt::route('/roles', 'admin.permissions.index')->name('roles.index');
+        Volt::route('/roles/{role}/edit', 'admin.permissions.edit')->name('roles.edit');
 });
 
 Route::middleware(['auth','must_set_password'])->group(function () {

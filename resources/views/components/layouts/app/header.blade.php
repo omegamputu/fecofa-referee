@@ -135,6 +135,12 @@
                             {{ __('Manage leagues') }}
                         </flux:menu.item>
                     @endcan
+
+                    @can('manage_roles')
+                        <flux:menu.item icon="key" :href="route('admin.roles.index')" wire:navigate>
+                            {{ __('Roles and permissions') }}
+                        </flux:menu.item>
+                    @endcan
                     @endhasanyrole
 
                     <flux:menu.item icon="cog" :href="route('profile.edit')" wire:navigate>
