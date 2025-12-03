@@ -109,6 +109,12 @@ new class extends Component {
                     </flux:button>
                 @endcan
 
+                @can('create_instructor')
+                    <flux:button variant="primary" color="cyan" href="{{ route('instructors.create') }}" wire:navigate>
+                        {{ __('Add instructor') }}
+                    </flux:button>
+                @endcan
+
                 @can('export_referee_data')
                     <flux:button variant="outline" href="{{ route('referees.export') }}">
                         {{ __('Export PDF') }}

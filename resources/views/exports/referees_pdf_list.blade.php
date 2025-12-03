@@ -19,7 +19,7 @@
         /* HEADER FIXE */
         header {
             position: fixed;
-            top: -90px;
+            top: -60px;
             left: 0;
             right: 0;
             height: 60px;
