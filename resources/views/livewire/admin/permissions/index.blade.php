@@ -45,7 +45,7 @@ new class extends Component {
 ?>
 
 <div>
-    <div class="container mx-auto h-full w-full max-w-5xl px-6">
+    <div class="container mx-auto h-full w-full max-w-7xl px-6">
         <section class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-600 rounded-xl p-4">
             <h2 class="text-base font-semibold dark:text-neutral-500 mb-3">
                 {{ __('All roles') }}
@@ -71,8 +71,8 @@ new class extends Component {
                                     @foreach ($role['permissions'] as $permission)
                                         <span
                                             class="inline-flex items-center gap-x-0.5 rounded-md bg-indigo-50 px-2 py-1 mb-2
-                                                                                                                                                                                 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10
-                                                                                                                                                                                 dark:bg-indigo-900/30 dark:text-indigo-300 dark:ring-indigo-700/30">
+                                                                                                                                                                                         text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10
+                                                                                                                                                                                         dark:bg-indigo-900/30 dark:text-indigo-300 dark:ring-indigo-700/30">
                                             {{ $permission['name'] }}
                                         </span>
                                     @endforeach
