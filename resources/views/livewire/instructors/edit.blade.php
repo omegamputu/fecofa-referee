@@ -357,7 +357,7 @@ new class extends Component {
 
     {{-- Footer fixe avec bouton Enregistrer --}}
     <div x-data="{ show: false }" x-init="
-        const toggleFooter = () => { show = window.scrollY > 200 };
+        const toggleFooter = () => { show = window.scrollY > 50 };
         toggleFooter();
         window.addEventListener('scroll', toggleFooter);
     " x-show="show" x-transition.opacity.duration.200ms
