@@ -48,7 +48,7 @@ new class extends Component {
         return [
             'categories' => RefereeCategory::select('id', 'name')->orderBy('id')->get()->toArray(),
             'roles' => RefereeRole::select('id', 'name')->orderBy('name')->get()->toArray(),
-            'instructor_roles' => InstructorRole::select('id', 'name')->orderBy('name')->get()->toArray(),
+            'instructor_roles' => InstructorRole::select('id', 'name')->orderBy('id')->get()->toArray(),
         ];
     }
 
