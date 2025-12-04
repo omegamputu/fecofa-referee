@@ -138,7 +138,7 @@ new class extends Component {
                 'after_or_equal:issue_date',
             ],
 
-            'start_year' => ['nullable', 'integer', 'min:1950', 'max:' . date('Y')],
+            'start_year' => ['nullable', 'integer', 'min:1940', 'max:' . date('Y')],
             'referee_category_id' => ['required', 'exists:referee_categories,id'],
             'referee_role_id' => ['required', 'exists:referee_roles,id'],
             'instructor_role_id' => ['required', 'exists:instructor_roles,id'],
