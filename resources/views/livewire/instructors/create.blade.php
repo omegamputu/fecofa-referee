@@ -83,7 +83,7 @@ new class extends Component {
         return [
             'last_name' => ['required', 'string', 'max:255'],
             'first_name' => ['required', 'string', 'max:255'],
-            'year_of_birth' => ['nullable', 'integer', 'min:1960', 'max:' . date('Y')],
+            'year_of_birth' => ['nullable', 'integer', 'min:1940', 'max:' . date('Y')],
             'gender' => ['required', Rule::in(['male', 'female'])],
             'education_level' => ['nullable', 'string', 'max:255'],
             'profession' => ['nullable', 'string', 'max:255'],
