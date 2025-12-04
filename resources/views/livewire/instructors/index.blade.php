@@ -59,7 +59,7 @@ new class extends Component {
             ->orderBy('id', 'asc');
 
         return [
-            'instructors' => $query->paginate(15),
+            'instructors' => $query->paginate(10),
         ];
     }
 }
