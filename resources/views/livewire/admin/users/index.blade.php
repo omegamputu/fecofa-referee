@@ -142,6 +142,22 @@ new class extends Component {
         session()->flash('status', __('Invitation sent again to :email', ['email' => $user->email]));
     }
 
+    public function resetTwoFactor(int $id)
+    {
+        $this->authorize('manage_users');
+
+        $user = User::findOrFail($id);
+
+        $user->forceFill([
+            'two_factor_secret' => null,
+            'two_factor_recovery_codes' => null,
+        ])->save();
+
+        session()->flash('status', __("Two-factor authentication has been reset for this user."));
+
+        $this->resetPage();
+    }
+
     public function delete(int $id, DeleteUser $deleteUser): void
     {
         $user = User::findOrFail($id);
@@ -257,7 +273,7 @@ new class extends Component {
                                 </td>
                                 <td>
                                     <flux:modal.trigger name="edit-user-{{ $u->id }}">
-                                        <flux:button wire:click="editUser({{ $u->id }})" :loading="false" size="sm"
+                                        <flux:button wire:click="editUser({{ $u->id }})" :loading="false" size="xs"
                                             class="cursor-pointer"> {{ __("Edit") }} </flux:button>
                                     </flux:modal.trigger>
                                     <flux:modal name="edit-user-{{ $u->id }}" class="md:w-96"
@@ -300,8 +316,44 @@ new class extends Component {
                                             </div>
                                         </div>
                                     </flux:modal>
+                                    @if ($u->two_factor_secret = !null)
+                                        <!-- Bouton ouvrir modal -->
+                                        <flux:modal.trigger name="reset-2fa-{{ $u->id }}">
+                                            <flux:button variant="primary" color="yellow" :loading="false" size="xs"
+                                                class="cursor-pointer">
+                                                {{ __("Reset 2FA") }}
+                                            </flux:button>
+                                        </flux:modal.trigger>
+
+                                        <!-- Modal de confirmation -->
+                                        <flux:modal name="reset-2fa-{{ $u->id }}" class="md:w-96">
+                                            <div class="space-y-4">
+                                                <flux:heading size="lg">{{ __("Reset Two-Factor Authentication") }}
+                                                </flux:heading>
+
+                                                <flux:text>
+                                                    {{ __("Are you sure you want to reset two-factor authentication for this user? They will need to reconfigure their authenticator app.") }}
+                                                </flux:text>
+
+                                                <div class="flex justify-end gap-2">
+                                                    <flux:modal.close>
+                                                        <flux:button variant="ghost">
+                                                            {{ __("Cancel") }}
+                                                        </flux:button>
+                                                    </flux:modal.close>
+
+                                                    <flux:modal.close>
+                                                        <flux:button variant="danger" wire:click="resetTwoFactor({{ $u->id }})">
+                                                            {{ __("Confirm") }}
+                                                        </flux:button>
+                                                    </flux:modal.close>
+                                                </div>
+                                            </div>
+                                        </flux:modal>
+                                    @endif
+
                                     <flux:modal.trigger name="resent-invitation-user-{{ $u->id }}">
-                                        <flux:button variant="primary" color="blue" :loading="false" size="sm"
+                                        <flux:button variant="primary" color="blue" :loading="false" size="xs"
                                             class="ms-1 cursor-pointer"> {{ __("Resend Invitation") }} </flux:button>
                                     </flux:modal.trigger>
                                     <flux:modal name="resent-invitation-user-{{ $u->id }}" class="md:w-96">
@@ -330,7 +382,7 @@ new class extends Component {
                                     </flux:modal>
                                     <flux:modal.trigger name="toggle-active-user-{{ $u->id }}">
                                         <flux:button variant="{{ $u->is_active ? 'primary' : 'primary' }}"
-                                            color="{{ $u->is_active ? 'orange' : 'emerald' }}" :loading="false" size="sm"
+                                            color="{{ $u->is_active ? 'orange' : 'emerald' }}" :loading="false" size="xs"
                                             class="cursor-pointer ms-1"> @if ($u->is_active) {{ __("Deactivate") }} @else
                                             {{ __("Activate") }} @endif
                                         </flux:button>
@@ -361,7 +413,7 @@ new class extends Component {
                                         </div>
                                     </flux:modal>
                                     <flux:modal.trigger name="delete-user-{{ $u->id }}">
-                                        <flux:button variant="danger" :loading="false" size="sm"
+                                        <flux:button variant="danger" :loading="false" size="xs"
                                             class="text-red-600 cursor-pointer ms-1"> {{ __("Delete") }} </flux:button>
                                     </flux:modal.trigger>
                                     <flux:modal name="delete-user-{{ $u->id }}" class="md:w-96">
