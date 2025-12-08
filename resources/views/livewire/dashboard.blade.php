@@ -10,8 +10,35 @@ new class extends Component {
         // 1. Statistiques simples
         $totalReferees = Referee::count();
 
-        $international = Referee::where('referee_category_id', 'internationale')->count();
-        $national = Referee::where('referee_category_id', 'nationale')->count();
+        $international = DB::table('referee_categories')
+            // 1. On sélectionne les colonnes de base de la catégorie
+            ->select('id', 'name')
+            // 2. On injecte le compteur via une sous-requête
+            ->addSelect([
+                'nombre_arbitres' => function ($query) {
+                    $query->selectRaw('COUNT(*)')
+                        ->from('referees')
+                        ->whereColumn('referees.referee_category_id', 'referee_categories.id');
+                }
+            ])
+            // 2. On filtre pour ne récupérer que la catégorie "Internationale"
+            ->where('name', 'Internationale')
+            ->get();
+
+        $national = DB::table('referee_categories')
+            // 1. On sélectionne les colonnes de base de la catégorie
+            ->select('id', 'name')
+            // 2. On injecte le compteur via une sous-requête
+            ->addSelect([
+                'nombre_arbitres' => function ($query) {
+                    $query->selectRaw('COUNT(*)')
+                        ->from('referees')
+                        ->whereColumn('referees.referee_category_id', 'referee_categories.id');
+                }
+            ])
+            // 2. On filtre pour ne récupérer que la catégorie "Internationale"
+            ->where('name', 'Nationale')
+            ->get();
 
         $newThisMonth = Referee::whereYear('created_at', now()->year)
             ->whereMonth('created_at', now()->month)
@@ -99,12 +126,12 @@ new class extends Component {
 
             <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-600 rounded-xl p-4">
                 <p class="text-xs uppercase text-neutral-500">{{ __('International') }}</p>
-                <p class="mt-2 text-2xl font-semibold">{{ $international }}</p>
+                <p class="mt-2 text-2xl font-semibold">{{ $international->first()->nombre_arbitres }}</p>
             </div>
 
             <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-600 rounded-xl p-4">
                 <p class="text-xs uppercase text-neutral-500">{{ __('National') }}</p>
-                <p class="mt-2 text-2xl font-semibold">{{ $national }}</p>
+                <p class="mt-2 text-2xl font-semibold">{{ $national->first()->nombre_arbitres }}</p>
             </div>
 
             <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-600 rounded-xl p-4">
