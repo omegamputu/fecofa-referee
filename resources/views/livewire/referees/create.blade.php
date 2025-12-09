@@ -145,7 +145,7 @@ new class extends Component {
             $personId = $this->generateRefereeId($league);
 
             // 3.5 Filet de sécurité supplémentaire (au cas où)
-            if (Referee::where('person_id', $personId)->exists()) {
+            if (Referee::where('person_id', '=', $personId)->exists()) {
                 // Ici on peut relancer une exception => rollback automatique
                 throw new \RuntimeException("Duplicate referee_id generated: {$personId}");
             }
@@ -208,10 +208,11 @@ new class extends Component {
     public function generateRefereeId(League $league): string
     {
         // Verrouiller les lignes des arbitres de cette ligue
-        $lastReferee = Referee::where('league_id', $league->id)
+        $lastReferee = Referee::where('league_id', '=', $league->id)
             ->lockForUpdate()        // important : doit être dans DB::transaction
             ->orderByDesc('id')
             ->first();
+
 
         // Calcul du numéro séquentiel
         $number = 1;
