@@ -453,5 +453,8 @@
     "Add permission": "Ajouter une permission",
     "No permissions assigned.": "Aucune permission attribuée.",
     "Permission name": "Nom de la permission",
-    "Edit Role": "Modifier le rôle"
+    "Edit Role": "Modifier le rôle",
+    "Back to dashboard": "Retour au tableau de bord",
+    "An internal error has occurred.": "Une erreur interne s'est produite.",
+    "The page you are looking for cannot be found.": "La page que vous recherchez est introuvable."
 }
