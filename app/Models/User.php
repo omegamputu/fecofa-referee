@@ -6,8 +6,10 @@ namespace App\Models;
 
 use App\Notifications\Admin\InviteUserToSetPassword;
 use App\Notifications\Admin\PasswordResetCustom;
+use Database\Factories\UserFactory;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -16,10 +18,10 @@ use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements CanResetPasswordContract
+class User extends Authenticatable implements CanResetPasswordContract, MustVerifyEmail
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles, CanResetPassword;
+    /** @use HasFactory<UserFactory> */
+    use CanResetPassword, HasFactory, HasRoles, Notifiable, TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -30,7 +32,7 @@ class User extends Authenticatable implements CanResetPasswordContract
         'name',
         'email',
         'password',
-        'is_active'
+        'is_active',
     ];
 
     /**
@@ -55,8 +57,8 @@ class User extends Authenticatable implements CanResetPasswordContract
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'invited_at'      => 'datetime',
-            'last_login_at'   => 'datetime',
+            'invited_at' => 'datetime',
+            'last_login_at' => 'datetime',
             'password_set_at' => 'datetime',
         ];
     }
@@ -79,7 +81,7 @@ class User extends Authenticatable implements CanResetPasswordContract
         $isInvite = Cache::pull("invite:{$this->email}", false);
 
         if ($isInvite) {
-             // Email d’INVITATION (ta vue markdown + route invite.accept)
+            // Email d’INVITATION (ta vue markdown + route invite.accept)
             $this->notify(new InviteUserToSetPassword($token));
         } else {
             // Email de RESET “oubli de mot de passe” (custom aussi si tu veux)

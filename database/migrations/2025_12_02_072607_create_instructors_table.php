@@ -27,7 +27,7 @@ return new class extends Migration
                 ->constrained('instructor_roles')
                 ->cascadeOnUpdate()
                 ->restrictOnDelete();
-            
+
             // Infos perso
             $table->string('last_name');          // NOM
             $table->string('first_name');         // Prénoms

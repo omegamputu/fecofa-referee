@@ -15,6 +15,7 @@ new class extends Component {
     public function mount(Role $role)
     {
         $this->role = $role;
+        $this->authorizePermissionManagement();
 
         // Permissions déjà liées
         $this->rolePermissions = $role->permissions->pluck('name')->toArray();
@@ -25,6 +26,8 @@ new class extends Component {
 
     public function createPermission()
     {
+        $this->authorizePermissionManagement();
+
         $name = trim($this->createPermissionName);
 
         if (!$name || Permission::where('name', $name)->exists()) {
@@ -43,6 +46,8 @@ new class extends Component {
 
     public function addPermission()
     {
+        $this->authorizePermissionManagement();
+
         if (!$this->newPermission || in_array($this->newPermission, $this->rolePermissions)) {
             return;
         }
@@ -56,6 +61,8 @@ new class extends Component {
 
     public function removePermission($permission)
     {
+        $this->authorizePermissionManagement();
+
         $this->role->revokePermissionTo($permission);
         $this->rolePermissions = array_values(array_diff($this->rolePermissions, [$permission]));
 
@@ -64,11 +71,22 @@ new class extends Component {
 
     public function updateRole()
     {
+        $this->authorizePermissionManagement();
+
         $this->role->save();
 
         session()->flash('status', __('Role updated successfully.'));
 
         $this->redirectRoute('admin.roles.index');
+    }
+
+    private function authorizePermissionManagement(): void
+    {
+        $this->authorize('manage_permissions');
+
+        if ($this->role->name === 'Owner' && ! auth()->user()->hasRole('Owner')) {
+            abort(403);
+        }
     }
 };
 ?>

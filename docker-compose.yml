@@ -20,12 +20,12 @@ services:
     container_name: laravel__db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root      # Définit le mot de passe root
-      MYSQL_DATABASE: fecofa_referee        # Crée la base de données automatiquement
-      MYSQL_USER: Admin       # Crée un utilisateur standard
-      MYSQL_PASSWORD: Ref@dmin2025         # Mot de passe de l'utilisateur laravel_user
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-local_root_password}
+      MYSQL_DATABASE: ${DB_DATABASE:-fecofa_referee}
+      MYSQL_USER: ${DB_USERNAME:-Admin}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-local_dev_password}
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     networks:
       - laravel_network
   # Service MailDev
@@ -34,8 +34,8 @@ services:
     container_name: mail_dev
     restart: unless-stopped
     ports:
-      - "1080:1080" # Interface web
-      - "1025:1025" # Serveur SMTP
+      - "127.0.0.1:1080:1080" # Interface web
+      - "127.0.0.1:1025:1025" # Serveur SMTP
     networks:
       - laravel_network
   # Service phpMyAdmin
@@ -45,9 +45,9 @@ services:
     restart: always
     environment:
       PMA_HOST: db
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-local_root_password}
     ports:
-      - "8081:80"
+      - "127.0.0.1:8081:80"
     depends_on:
       - db
     networks:
@@ -59,7 +59,7 @@ services:
     container_name: laravel__webserver
     restart: always
     ports:
-      - "8080:80"
+      - "127.0.0.1:8080:80"
     volumes:
       - .:/var/www
       - ./docker/nginx:/etc/nginx/conf.d

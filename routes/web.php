@@ -1,10 +1,10 @@
 <?php
 
+use App\Http\Controllers\Referee\ExportController;
 use App\Livewire\Auth\InviteSetPassword;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
-use App\Http\Controllers\Referee\ExportController;
 
 Route::get('/', function () {
     return view('livewire.auth.login');
@@ -16,12 +16,13 @@ Route::get('/lang/{lang}', function ($lang) {
     if (in_array($lang, $availableLangs)) {
         session(['locale' => $lang]);
     }
+
     return redirect()->back();
 })->name('lang.switch');
 
 Volt::route('/invite/accept/{token}', InviteSetPassword::class)->name('invite.accept');
 
-Route::middleware(['auth', 'verified' ,'must_set_password'])->group(function () {
+Route::middleware(['auth', 'verified', 'must_set_password'])->group(function () {
     Volt::route('/dashboard', 'dashboard')
         ->name('dashboard');
 });
@@ -30,57 +31,65 @@ Route::middleware(['auth', 'permission:admin_access', 'must_set_password'])
     ->prefix('admin')->name('admin')->as('admin.')
     ->group(function () {
         Volt::route('/dashboard', 'admin.dashboard')->name('dashboard');
-        //Volt::route('roles', 'admin.roles')->name('roles.index');
-        //Volt::route('permissions', 'admin.permissions')->name('permissions.index');
+        // Volt::route('roles', 'admin.roles')->name('roles.index');
+        // Volt::route('permissions', 'admin.permissions')->name('permissions.index');
         Volt::route('/users', 'admin.users.index')->name('users.index');
         Volt::route('/leagues', 'admin.leagues.index')->name('leagues.index');
-        Volt::route('/roles', 'admin.permissions.index')->name('roles.index');
-        Volt::route('/roles/{role}/edit', 'admin.permissions.edit')->name('roles.edit');
-});
+        Volt::route('/roles', 'admin.permissions.index')
+            ->name('roles.index')
+            ->middleware(['permission:manage_roles']);
+        Volt::route('/roles/{role}/edit', 'admin.permissions.edit')
+            ->name('roles.edit')
+            ->middleware(['permission:manage_permissions']);
+    });
 
-Route::middleware(['auth','must_set_password'])->group(function () {
-    Volt::route('/instructors/roles', 'instructors.roles')->name('instructors.roles');
-    Volt::route('/instructors/list', 'instructors.index')->name('instructors.index');
+Route::middleware(['auth', 'must_set_password'])->group(function () {
+    Volt::route('/instructors/roles', 'instructors.roles')
+        ->name('instructors.roles')
+        ->middleware(['permission:manage_instructor_roles']);
+    Volt::route('/instructors/list', 'instructors.index')
+        ->name('instructors.index')
+        ->middleware(['permission:view_instructor']);
     Volt::route('/instructors/create', 'instructors.create')
-            ->name('instructors.create')
-            ->middleware(['permission:create_referee']);
+        ->name('instructors.create')
+        ->middleware(['permission:create_instructor']);
 
-        Volt::route('/instructors/{instructor}/edit', 'instructors.edit')
-            ->name('instructors.edit')
-            ->whereNumber('referee')
-            ->middleware(['permission:edit_instructor']);
+    Volt::route('/instructors/{instructor}/edit', 'instructors.edit')
+        ->name('instructors.edit')
+        ->whereNumber('instructor')
+        ->middleware(['permission:edit_instructor']);
 });
-////////////////////
-/// Referee routes
-Route::middleware(['auth','must_set_password'])->group(function () {
-        Volt::route('/referees/categories', 'referees.categories.index')
-            ->name('referees.categories.index')
-            ->middleware(['permission:manage_referee_categories']);
+// //////////////////
+// / Referee routes
+Route::middleware(['auth', 'must_set_password'])->group(function () {
+    Volt::route('/referees/categories', 'referees.categories.index')
+        ->name('referees.categories.index')
+        ->middleware(['permission:manage_referee_categories']);
 
-        Volt::route('/referees/list', 'referees.index')
-            ->name('referees.index')
-            ->middleware(['permission:view_referee']);
+    Volt::route('/referees/list', 'referees.index')
+        ->name('referees.index')
+        ->middleware(['permission:view_referee']);
 
-        Volt::route('/referees/create', 'referees.create')
-            ->name('referees.create')
-            ->middleware(['permission:create_referee']);
+    Volt::route('/referees/create', 'referees.create')
+        ->name('referees.create')
+        ->middleware(['permission:create_referee']);
 
-        Volt::route('/referees/{referee}/edit', 'referees.edit')
-            ->name('referees.edit')
-            ->whereNumber('referee')
-            ->middleware(['permission:edit_referee']);
+    Volt::route('/referees/{referee}/edit', 'referees.edit')
+        ->name('referees.edit')
+        ->whereNumber('referee')
+        ->middleware(['permission:edit_referee']);
 });
 
 // Export PDF
 Route::get('/referees/export', [ExportController::class, 'refereeExportPdf'])
-        ->name('referees.export')
-        ->middleware(['auth', 'permission:export_referee_data']);
+    ->name('referees.export')
+    ->middleware(['auth', 'permission:export_referee_data']);
 
 Route::get('/instructors/export', [ExportController::class, 'instructorExportPdf'])
-        ->name('instructors.export')
-        ->middleware(['auth', 'permission:export_referee_data']);
+    ->name('instructors.export')
+    ->middleware(['auth', 'permission:export_referee_data']);
 
-////////////////////
+// //////////////////
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
@@ -102,7 +111,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Invitation-only : bloquer /register s’il reste un lien perdu
-Route::match(['get','post'], '/register', function () {
+Route::match(['get', 'post'], '/register', function () {
     return redirect()->route('login')
-        ->withErrors(['email' => "L’inscription publique est désactivée. Demandez une invitation à l’administrateur (support@fecofa.cd)."]);
+        ->withErrors(['email' => 'L’inscription publique est désactivée. Demandez une invitation à l’administrateur (support@fecofa.cd).']);
 })->name('register')->middleware('guest');

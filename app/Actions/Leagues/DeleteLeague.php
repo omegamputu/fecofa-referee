@@ -6,7 +6,6 @@ use App\Models\League;
 
 class DeleteLeague
 {
-
     /**
      * Invoke the class instance.
      */

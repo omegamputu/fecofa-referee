@@ -2,7 +2,6 @@
 
 namespace App\Models\Referees;
 
-use App\Models\Referees\Referee;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 

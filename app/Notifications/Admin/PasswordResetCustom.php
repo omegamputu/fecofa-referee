@@ -3,7 +3,6 @@
 namespace App\Notifications\Admin;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -42,11 +41,11 @@ class PasswordResetCustom extends Notification
         ], false));
 
         return (new MailMessage)
-                ->subject("Réinitialisez votre mot de passe")
-                ->markdown('mail.user.password-reset', [
-                    'user' => $notifiable,
-                    'url' => $url,
-                ]);
+            ->subject('Réinitialisez votre mot de passe')
+            ->markdown('mail.user.password-reset', [
+                'user' => $notifiable,
+                'url' => $url,
+            ]);
     }
 
     /**

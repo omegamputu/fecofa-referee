@@ -3,6 +3,7 @@
 namespace App\Actions\Users;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Password;
 
 class ResendInvite
@@ -21,8 +22,10 @@ class ResendInvite
     public function __invoke(User $user): void
     {
         if ($user->hasRole('Owner')) {
-            abort(403, "You can not resend invitation to Owner");
+            abort(403, 'You can not resend invitation to Owner');
         }
+
+        Cache::put("invite:{$user->email}", true, now()->addMinutes(2));
 
         Password::broker('invites')->sendResetLink(['email' => $user->email]);
 

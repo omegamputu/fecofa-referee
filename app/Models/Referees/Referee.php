@@ -3,11 +3,6 @@
 namespace App\Models\Referees;
 
 use App\Models\League;
-use App\Models\Referees\IdentityDocument;
-use App\Models\Referees\RefereeMedicalExam;
-use App\Models\Referees\RefereePhysicalTest;
-use App\Models\Referees\RefereeSeason;
-use App\Models\Referees\RefereeRole;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -41,6 +36,8 @@ class Referee extends Model
 
     protected $casts = [
         'date_of_birth' => 'date',
+        'has_medical_clearance' => 'boolean',
+        'has_physical_clearance' => 'boolean',
         'is_active' => 'boolean',
         'is_fifa_listed' => 'boolean',
     ];

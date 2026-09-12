@@ -9,7 +9,7 @@ class RefereeRole extends Model
 {
     //
     protected $fillable = [
-        'name', 'slug', 'description'
+        'name', 'slug', 'description',
     ];
 
     public function referees(): HasMany

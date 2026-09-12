@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Referees\Referee;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -20,6 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call(LeagueSeeder::class);
         $this->call(RefereeCategorySeeder::class);
         $this->call(RefereeRoleSeeder::class);
-        //$this->call(RefereeSeeder::class);
+        $this->call(InstructorRoleSeeder::class);
+        // $this->call(RefereeSeeder::class);
     }
 }

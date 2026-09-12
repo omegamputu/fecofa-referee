@@ -7,7 +7,6 @@ use App\Models\Instructors\Instructor;
 use App\Models\Referees\RefereeCategory;
 use App\Models\Instructors\InstructorRole;
 use Livewire\WithFileUploads;
-use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 
 new class extends Component {
@@ -38,11 +37,6 @@ new class extends Component {
     public ?string $education_level = null;
 
     public ?int $start_year = null; // Year the referee started
-
-    public ?string $identity_type = null;
-    public ?string $number = null;
-    public ?string $issue_date = null;
-    public ?string $expiry_date = null;
 
     // Upload photo
     public $profile_photo = null;
@@ -119,25 +113,6 @@ new class extends Component {
             'email' => ['nullable', 'email', 'max:255'],
             'address' => ['nullable', 'string'],
 
-            'identity_type' => ['nullable', Rule::in(['passport', 'national_id', 'other', ''])],
-            'number' => [
-                Rule::requiredIf($this->identity_type === 'passport'),
-                'nullable',
-                'string',
-                'max:255',
-            ],
-            'issue_date' => [
-                Rule::requiredIf($this->identity_type === 'passport'),
-                'nullable',
-                'date',
-            ],
-            'expiry_date' => [
-                Rule::requiredIf($this->identity_type === 'passport'),
-                'nullable',
-                'date',
-                'after_or_equal:issue_date',
-            ],
-
             'start_year' => ['nullable', 'integer', 'min:1960', 'max:' . date('Y')],
             'referee_category_id' => ['required', 'exists:referee_categories,id'],
             'referee_role_id' => ['required', 'exists:referee_roles,id'],
@@ -149,18 +124,14 @@ new class extends Component {
 
     public function save(): void
     {
+        $this->authorize('edit_instructor');
+
         //1. Validation des datas
         $data = $this->validate();
 
         // 2. Transaction
         DB::transaction(function () use ($data) {
 
-            // 3.6 Upload de la photo éventuelle
-            $photoPath = null;
-            if ($this->profile_photo) {
-                $photoPath = $this->uploadProfilePhoto();
-            }
-            // 
             $this->instructor->fill([
                 'instructor_role_id' => $this->instructor_role_id,
                 'referee_role_id' => $this->referee_role_id,
@@ -179,9 +150,8 @@ new class extends Component {
 
             // b) Gestion de la photo (si nouvelle)
             if ($this->profile_photo) {
-                //$path = $this->profile_photo->store('referees', 'public');
                 $path = $this->uploadProfilePhoto();
-                $this->referee->profile_photo_path = $path;
+                $this->instructor->profile_photo_path = $path;
             }
 
             $this->instructor->save();
