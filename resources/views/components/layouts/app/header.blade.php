@@ -72,6 +72,14 @@
 
             @endhasanyrole
 
+            @can('manage_seasons')
+                <flux:navbar.item icon="calendar-days" :href="route('referees.designations.index')"
+                    :current="request()->routeIs('referees.designations.*')" wire:navigate
+                    class="{{ $baseLink }} {{ request()->routeIs('referees.designations.*') ? '!text-white !font-semibold' : '' }}">
+                    {{ __('Season designations') }}
+                </flux:navbar.item>
+            @endcan
+
             @can('view_instructor')
                 <flux:navbar.item icon="academic-cap" :href="route('instructors.index')"
                     :current="request()->routeIs('instructors.index')" wire:navigate
@@ -138,6 +146,12 @@
                         </flux:menu.item>
                     @endcan
 
+                    @can('admin_access')
+                        <flux:menu.item icon="calendar-days" :href="route('admin.exam-periods.index')" wire:navigate>
+                            {{ __('Exam periods') }}
+                        </flux:menu.item>
+                    @endcan
+
                     @can('manage_roles')
                         <flux:menu.item icon="key" :href="route('admin.roles.index')" wire:navigate>
                             {{ __('Roles and permissions') }}
@@ -181,6 +195,27 @@
                     :current="request()->routeIs('dashboard')" wire:navigate>
                     {{ __('Dashboard') }}
                 </flux:navlist.item>
+
+                @can('view_referee')
+                    <flux:navlist.item icon="queue-list" :href="route('referees.index')"
+                        :current="request()->routeIs('referees.index')" wire:navigate>
+                        {{ __('Referees') }}
+                    </flux:navlist.item>
+                @endcan
+
+                @can('manage_seasons')
+                    <flux:navlist.item icon="calendar-days" :href="route('referees.designations.index')"
+                        :current="request()->routeIs('referees.designations.*')" wire:navigate>
+                        {{ __('Season designations') }}
+                    </flux:navlist.item>
+                @endcan
+
+                @can('view_instructor')
+                    <flux:navlist.item icon="academic-cap" :href="route('instructors.index')"
+                        :current="request()->routeIs('instructors.index')" wire:navigate>
+                        {{ __('Instructors') }}
+                    </flux:navlist.item>
+                @endcan
             </flux:navlist.group>
         </flux:navlist>
 

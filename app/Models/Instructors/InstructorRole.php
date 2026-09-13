@@ -9,7 +9,7 @@ class InstructorRole extends Model
 {
     //
     protected $fillable = [
-        'name', 'slug', 'description'
+        'name', 'slug', 'description',
     ];
 
     public function instructors(): HasMany

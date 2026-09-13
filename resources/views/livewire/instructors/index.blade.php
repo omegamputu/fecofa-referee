@@ -11,9 +11,9 @@ new class extends Component {
     use WithPagination;
 
     public string $search = '';
-    public ?int $RefereeRoleFilter = null;
-    public ?int $RefereeCategoryFilter = null;
-    public ?int $InstructorRoleFilter = null;
+    public ?int $refereeRoleFilter = null;
+    public ?int $refereeCategoryFilter = null;
+    public ?int $instructorRoleFilter = null;
 
     public array $categories = [];
     public array $roles = [];
@@ -23,6 +23,7 @@ new class extends Component {
     {
         $this->roles = RefereeRole::orderBy('name')->get(['id', 'name'])->toArray();
         $this->instructors_roles = InstructorRole::orderBy('name')->get(['id', 'name'])->toArray();
+        $this->categories = RefereeCategory::orderBy('name')->get(['id', 'name'])->toArray();
     }
 
     public function updatingSearch(): void
@@ -30,7 +31,17 @@ new class extends Component {
         $this->resetPage();
     }
 
-    public function updatingRoleFilter(): void
+    public function updatingRefereeRoleFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingRefereeCategoryFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingInstructorRoleFilter(): void
     {
         $this->resetPage();
     }
@@ -49,12 +60,15 @@ new class extends Component {
                 });
             })
             // 🎯 filtre Instructor Role (id numérique)
-            ->when(filled($this->InstructorRoleFilter), function ($q) {
-                $q->where('instructor_role_id', $this->InstructorRoleFilter);
+            ->when(filled($this->instructorRoleFilter), function ($q) {
+                $q->where('instructor_role_id', $this->instructorRoleFilter);
             })
             // 🎯 filtre Fonction
-            ->when(filled($this->RefereeRoleFilter), function ($q) {
-                $q->where('referee_role_id', $this->RefereeRoleFilter);
+            ->when(filled($this->refereeRoleFilter), function ($q) {
+                $q->where('referee_role_id', $this->refereeRoleFilter);
+            })
+            ->when(filled($this->refereeCategoryFilter), function ($q) {
+                $q->where('referee_category_id', $this->refereeCategoryFilter);
             })
             ->orderBy('id', 'asc');
 
@@ -76,7 +90,7 @@ new class extends Component {
                     placeholder="{{ __('Search by name, category or role') }}"
                     wire:model.live.debounce.400ms="search" />
 
-                <flux:select wire:model="InstructorRoleFilter" class="w-48">
+                <flux:select wire:model.live="instructorRoleFilter" class="w-48">
                     <flux:select.option value="">{{ __('All roles') }}</flux:select.option>
                     @foreach($instructors_roles as $item)
                         <flux:select.option value="{{ $item['id'] }}">
@@ -85,11 +99,20 @@ new class extends Component {
                     @endforeach
                 </flux:select>
 
-                <flux:select wire:model="roleFilter" class="w-48">
+                <flux:select wire:model.live="refereeRoleFilter" class="w-48">
                     <flux:select.option value="">{{ __('All functions') }}</flux:select.option>
                     @foreach($roles as $role)
                         <flux:select.option value="{{ $role['id'] }}">
                             {{ $role['name'] }}
+                        </flux:select.option>
+                    @endforeach
+                </flux:select>
+
+                <flux:select wire:model.live="refereeCategoryFilter" class="w-48">
+                    <flux:select.option value="">{{ __('All categories') }}</flux:select.option>
+                    @foreach($categories as $category)
+                        <flux:select.option value="{{ $category['id'] }}">
+                            {{ $category['name'] }}
                         </flux:select.option>
                     @endforeach
                 </flux:select>
@@ -103,10 +126,11 @@ new class extends Component {
             @endcan
 
             @can('export_referee_data')
-                        <a href="{{ route('instructors.export', [
+                <a href="{{ route('instructors.export', [
                     'search' => $search ?? null,
-                    'league' => $leagueFilter ?? null,
-                    'role' => $roleFilter ?? null,
+                    'instructor_role' => $instructorRoleFilter,
+                    'referee_role' => $refereeRoleFilter,
+                    'category' => $refereeCategoryFilter,
                 ]) }}"
                             class="inline-flex items-center rounded-lg bg-white border px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
                             {{ __("Export PDF") }}

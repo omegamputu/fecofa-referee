@@ -17,8 +17,8 @@ class CreateUser
         //
         return DB::transaction(function () use ($data, $role) {
             $user = User::create([
-                'name'     => $data['name'],
-                'email'    => $data['email'],
+                'name' => $data['name'],
+                'email' => $data['email'],
                 'password' => bcrypt(str()->random(12)),
             ]);
 

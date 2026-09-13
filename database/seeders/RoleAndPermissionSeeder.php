@@ -3,11 +3,11 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class RoleAndPermissionSeeder extends Seeder
 {
@@ -17,9 +17,9 @@ class RoleAndPermissionSeeder extends Seeder
     public function run(): void
     {
         // Nettoyage (facultatif)
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-         /*
+        /*
         |--------------------------------------------------------------------------
         | Définition des permissions
         |--------------------------------------------------------------------------
@@ -42,7 +42,7 @@ class RoleAndPermissionSeeder extends Seeder
             'manage_seasons',
 
             // Import / export
-            //'export_internal_list',
+            // 'export_internal_list',
             'export_referee_data',
             'import_referee_data',
 
@@ -51,6 +51,13 @@ class RoleAndPermissionSeeder extends Seeder
             'create_referee',
             'edit_referee',
             'delete_referee',
+
+            // Instructeurs
+            'view_instructor',
+            'create_instructor',
+            'edit_instructor',
+            'delete_instructor',
+            'manage_instructor_roles',
 
             // Affectations
             'assign_match',
@@ -102,16 +109,26 @@ class RoleAndPermissionSeeder extends Seeder
             'manage_referees',  // accès complet aux arbitres
             'referee_access',  // accès aux écrans arbitres
             'admin_access',
-            'view_referee'
+            'view_referee',
+            'view_instructor',
+            'create_instructor',
+            'edit_instructor',
+            'delete_instructor',
+            'manage_instructor_roles',
         ]);
 
         // --- MEMBER (Département arbitrage, CNA, etc.) ---
         $member->syncPermissions([
             'manage_referees',      // clé pour tous les écrans arbitres
+            'manage_seasons',       // listes annuelles Ligue 1 et Ligue 2
             'view_referee',
             'create_referee',
             'edit_referee',
-            //'delete_referee',
+            // 'delete_referee',
+
+            'view_instructor',
+            'create_instructor',
+            'edit_instructor',
 
             'assign_match',
             'edit_assignment',
@@ -135,6 +152,7 @@ class RoleAndPermissionSeeder extends Seeder
             'generate_reports',
             'export_referee_data',
             'referee_access',
+            'view_instructor',
         ]);
 
         // --- OWNER = tous les droits ---
@@ -146,20 +164,30 @@ class RoleAndPermissionSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
         $email = env('SUPER_ADMIN_EMAIL', 'superadmin@fecofa.cd');
-        $pass  = env('SUPER_ADMIN_PASSWORD', 'Ref@dmin#2025');
+        $user = User::where('email', $email)->first();
 
-        $user = User::firstOrCreate(
-            ['email' => $email],
-            [
-                'name'     => 'Super Admin',
+        if (! $user) {
+            $pass = env('SUPER_ADMIN_PASSWORD');
+
+            if (blank($pass)) {
+                throw new \RuntimeException(
+                    'SUPER_ADMIN_PASSWORD must be defined before running RoleAndPermissionSeeder.'
+                );
+            }
+
+            $user = User::create([
+                'name' => 'Super Admin',
+                'email' => $email,
                 'password' => Hash::make($pass),
-            ]
-        );
+            ]);
+        }
 
-        $user->forceFill(['password_set_at' => now()])->save();
+        $user->forceFill([
+            'password_set_at' => now(),
+            'email_verified_at' => $user->email_verified_at ?? now(),
+        ])->save();
         $user->syncRoles(['Owner']);
 
-
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
     }
 }

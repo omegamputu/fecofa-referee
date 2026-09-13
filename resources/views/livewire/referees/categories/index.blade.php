@@ -94,7 +94,7 @@ new class extends Component {
 
     public function updateCategory(): void
     {
-        $this->authorize('manage', RefereeCategory::class);
+        $this->authorize('manage_referee_categories', RefereeCategory::class);
 
         $data = $this->validate($this->updateRules());
 
@@ -113,7 +113,7 @@ new class extends Component {
 
     public function deleteCategory(int $id): void
     {
-        $this->authorize('manage', RefereeCategory::class);
+        $this->authorize('manage_referee_categories', RefereeCategory::class);
 
         $category = RefereeCategory::findOrFail($id);
 

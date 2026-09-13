@@ -1,21 +1,22 @@
 <?php
 
-test('registration screen can be rendered', function () {
+use App\Models\User;
+
+test('public registration redirects to login', function () {
     $response = $this->get(route('register'));
 
-    $response->assertStatus(200);
+    $response->assertRedirect(route('login'));
 });
 
-test('new users can register', function () {
-    $response = $this->post(route('register.store'), [
+test('new users cannot register publicly', function () {
+    $response = $this->post('/register', [
         'name' => 'John Doe',
         'email' => 'test@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
     ]);
 
-    $response->assertSessionHasNoErrors()
-        ->assertRedirect(route('dashboard', absolute: false));
-
-    $this->assertAuthenticated();
+    $response->assertRedirect(route('login'));
+    $this->assertGuest();
+    $this->assertDatabaseMissing(User::class, ['email' => 'test@example.com']);
 });

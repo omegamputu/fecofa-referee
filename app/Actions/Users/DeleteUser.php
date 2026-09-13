@@ -20,7 +20,7 @@ class DeleteUser
     public function __invoke(User $user): void
     {
         if ($user->hasRole('Owner')) {
-            abort(403, "You can not delete Owner");
+            abort(403, 'You can not delete Owner');
         }
 
         $user->delete();
