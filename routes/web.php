@@ -35,6 +35,7 @@ Route::middleware(['auth', 'permission:admin_access', 'must_set_password'])
         // Volt::route('permissions', 'admin.permissions')->name('permissions.index');
         Volt::route('/users', 'admin.users.index')->name('users.index');
         Volt::route('/leagues', 'admin.leagues.index')->name('leagues.index');
+        Volt::route('/exam-periods', 'admin.exam-periods.index')->name('exam-periods.index');
         Volt::route('/roles', 'admin.permissions.index')
             ->name('roles.index')
             ->middleware(['permission:manage_roles']);
@@ -62,6 +63,10 @@ Route::middleware(['auth', 'must_set_password'])->group(function () {
 // //////////////////
 // / Referee routes
 Route::middleware(['auth', 'must_set_password'])->group(function () {
+    Volt::route('/referees/designations', 'referees.designations.index')
+        ->name('referees.designations.index')
+        ->middleware(['permission:manage_seasons']);
+
     Volt::route('/referees/categories', 'referees.categories.index')
         ->name('referees.categories.index')
         ->middleware(['permission:manage_referee_categories']);
@@ -84,6 +89,10 @@ Route::middleware(['auth', 'must_set_password'])->group(function () {
 Route::get('/referees/export', [ExportController::class, 'refereeExportPdf'])
     ->name('referees.export')
     ->middleware(['auth', 'permission:export_referee_data']);
+
+Route::get('/referees/eligible/export', [ExportController::class, 'eligibleRefereesExportPdf'])
+    ->name('referees.eligible.export')
+    ->middleware(['auth', 'must_set_password', 'permission:export_referee_data']);
 
 Route::get('/instructors/export', [ExportController::class, 'instructorExportPdf'])
     ->name('instructors.export')

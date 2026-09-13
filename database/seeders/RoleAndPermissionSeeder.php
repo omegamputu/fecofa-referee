@@ -120,6 +120,7 @@ class RoleAndPermissionSeeder extends Seeder
         // --- MEMBER (Département arbitrage, CNA, etc.) ---
         $member->syncPermissions([
             'manage_referees',      // clé pour tous les écrans arbitres
+            'manage_seasons',       // listes annuelles Ligue 1 et Ligue 2
             'view_referee',
             'create_referee',
             'edit_referee',

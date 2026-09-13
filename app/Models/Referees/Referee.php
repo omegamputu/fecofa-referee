@@ -3,6 +3,7 @@
 namespace App\Models\Referees;
 
 use App\Models\League;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,7 +11,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Referee extends Model
 {
-    //
     protected $fillable = [
         'league_id',
         'referee_category_id',
@@ -77,7 +77,49 @@ class Referee extends Model
         return $this->hasMany(RefereeSeason::class);
     }
 
-    // Petit helper pratique
+    public function scopeEligibleForSeason(Builder $query, ?int $seasonYear = null): Builder
+    {
+        $query
+            ->where('is_active', true)
+            ->whereHas('refereeRole', fn (Builder $roleQuery) => $roleQuery
+                ->whereIn('slug', RefereeRole::officiatingSlugs()));
+
+        if ($seasonYear === null) {
+            return $query
+                ->where('has_medical_clearance', true)
+                ->where('has_physical_clearance', true);
+        }
+
+        return $query
+            ->whereHas('medicalExams', fn (Builder $examQuery) => $examQuery
+                ->where('season_year', $seasonYear)
+                ->where('result', RefereeMedicalExam::RESULT_PASSED))
+            ->whereHas('physicalTests', fn (Builder $testQuery) => $testQuery
+                ->where('season_year', $seasonYear)
+                ->where('result', RefereePhysicalTest::RESULT_PASSED));
+    }
+
+    public function isEligibleForSeason(?int $seasonYear = null): bool
+    {
+        if (! $this->is_active
+            || ! in_array($this->refereeRole?->slug, RefereeRole::officiatingSlugs(), true)) {
+            return false;
+        }
+
+        if ($seasonYear === null) {
+            return $this->has_medical_clearance && $this->has_physical_clearance;
+        }
+
+        return $this->medicalExams()
+            ->where('season_year', $seasonYear)
+            ->where('result', RefereeMedicalExam::RESULT_PASSED)
+            ->exists()
+            && $this->physicalTests()
+                ->where('season_year', $seasonYear)
+                ->where('result', RefereePhysicalTest::RESULT_PASSED)
+                ->exists();
+    }
+
     public function fullName(): string
     {
         return "{$this->last_name} {$this->first_name}";
