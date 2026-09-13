@@ -7,7 +7,6 @@ use Illuminate\Support\Str;
 
 class CreateLeague
 {
-
     /**
      * Invoke the class instance.
      */
@@ -15,11 +14,11 @@ class CreateLeague
     {
         //
         return League::create([
-            'name'          => $data['name'],
-            'slug'          => Str::slug($data['name']),
-            'code'          => $data['code'] ?? null,
-            'province'      => $data['province'] ?? null,
-            'headquarters'  => $data['headquarters'] ?? null,
+            'name' => $data['name'],
+            'slug' => Str::slug($data['name']),
+            'code' => $data['code'] ?? null,
+            'province' => $data['province'] ?? null,
+            'headquarters' => $data['headquarters'] ?? null,
             'contact_email' => $data['contact_email'] ?? null,
             'contact_phone' => $data['contact_phone'] ?? null,
         ]);

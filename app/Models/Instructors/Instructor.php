@@ -2,12 +2,10 @@
 
 namespace App\Models\Instructors;
 
-use App\Models\Referees\IdentityDocument;
 use App\Models\Referees\RefereeCategory;
 use App\Models\Referees\RefereeRole;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Instructor extends Model
 {
@@ -43,10 +41,5 @@ class Instructor extends Model
     public function refereeRole(): BelongsTo
     {
         return $this->belongsTo(RefereeRole::class, 'referee_role_id');
-    }
-
-    public function identityDocument(): HasOne
-    {
-        return $this->hasOne(IdentityDocument::class);
     }
 }

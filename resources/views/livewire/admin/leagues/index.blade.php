@@ -58,8 +58,8 @@ new class extends Component {
     {
         return [
             'name' => ['required', 'string', 'max:255', 'unique:leagues,name'],
-            'code' => ['nullable', 'string', 'max:50', 'unique:leagues,code'],
-            'province' => ['nullable', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:50', 'unique:leagues,code'],
+            'province' => ['required', 'string', 'max:255'],
             'headquarters' => ['nullable', 'string', 'max:255'],
             'contact_email' => ['nullable', 'email', 'max:255'],
             'contact_phone' => ['nullable', 'string', 'max:50'],
@@ -70,8 +70,8 @@ new class extends Component {
     {
         return [
             'editName' => ['required', 'string', 'max:255', 'unique:leagues,name,' . $this->editLeagueId],
-            'editCode' => ['nullable', 'string', 'max:50', 'unique:leagues,code,' . $this->editLeagueId],
-            'editProvince' => ['nullable', 'string', 'max:255'],
+            'editCode' => ['required', 'string', 'max:50', 'unique:leagues,code,' . $this->editLeagueId],
+            'editProvince' => ['required', 'string', 'max:255'],
             'editHeadquarters' => ['nullable', 'string', 'max:255'],
             'editContactEmail' => ['nullable', 'email', 'max:255'],
             'editContactPhone' => ['nullable', 'string', 'max:50'],
@@ -88,7 +88,7 @@ new class extends Component {
 
         app(CreateLeague::class)($validated);
 
-        $this->reset(['name', 'province', 'headquarters', 'contact_email', 'contact_phone']);
+        $this->reset(['name', 'code', 'province', 'headquarters', 'contact_email', 'contact_phone']);
         session()->flash('message', __('League created successfully.'));
 
         $this->resetPage();
@@ -237,8 +237,8 @@ new class extends Component {
                 <flux:text>{{ __("Describe league details.") }}</flux:text>
 
                 <flux:input label="{{ __('Name') }}" wire:model.defer="name" />
-                <flux:input label="Code" wire:model.defer="code" />
-                <flux:input label="Province" wire:model.defer="province" />
+                <flux:input label="Code" wire:model.defer="code" required />
+                <flux:input label="Province" wire:model.defer="province" required />
                 <flux:input label="{{ __('Headquarters') }}" wire:model.defer="headquarters" />
                 <flux:input label="{{ __('Contact email') }}" wire:model.defer="contact_email" />
                 <flux:input label="{{ __('Contact phone') }}" wire:model.defer="contact_phone" />
@@ -260,8 +260,8 @@ new class extends Component {
                     <flux:text>{{ __("Update league details.") }}</flux:text>
 
                     <flux:input label="{{ __('Name') }}" wire:model.defer="editName" />
-                    <flux:input label="Code" wire:model.defer="editCode" />
-                    <flux:input label="Province" wire:model.defer="editProvince" />
+                    <flux:input label="Code" wire:model.defer="editCode" required />
+                    <flux:input label="Province" wire:model.defer="editProvince" required />
                     <flux:input label="{{ __('Headquarters') }}" wire:model.defer="editHeadquarters" />
                     <flux:input label="{{ __('Contact email') }}" wire:model.defer="editContactEmail" />
                     <flux:input label="{{ __('Contact phone') }}" wire:model.defer="editContactPhone" />

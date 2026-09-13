@@ -20,7 +20,7 @@ class UpdateUser
     public function __invoke(User $user, array $data, string $role): User
     {
         $user->update([
-            'name'  => $data['name'],
+            'name' => $data['name'],
             'email' => $data['email'],
         ]);
 

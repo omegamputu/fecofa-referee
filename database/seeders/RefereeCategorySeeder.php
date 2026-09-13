@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -75,7 +74,7 @@ class RefereeCategorySeeder extends Seeder
                 'slug' => Str::slug('ccl2'),
                 'description' => '',
                 'created_at' => now(),
-            ]
+            ],
         ];
 
         DB::table('referee_categories')->insert($categories);

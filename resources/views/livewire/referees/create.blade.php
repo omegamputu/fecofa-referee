@@ -54,8 +54,8 @@ new class extends Component {
         if ($value && is_numeric($value)) {
             $year = intval($value);
 
-            if ($year >= 1980 && $year <= now()->year + 1) {
-                $this->referee_start_year = $year;
+            if ($year >= 1980 && $year <= now()->year) {
+                $this->start_year = $year;
             } else {
                 $this->addError('start_year', __('Invalid year'));
             }
@@ -130,6 +130,8 @@ new class extends Component {
 
     public function save(): void
     {
+        $this->authorize('create_referee');
+
         //1. Validation des datas
         $data = $this->validate();
 
@@ -156,9 +158,6 @@ new class extends Component {
                 $photoPath = $this->uploadProfilePhoto();
             }
 
-            $startYear = $this->updatedStartYear($data['start_year']);
-            // 
-
             // 3.7 Création de l’arbitre
             $referee = Referee::create([
                 'league_id' => $data['league_id'],
@@ -173,7 +172,7 @@ new class extends Component {
                 'address' => $data['address'],
                 'education_level' => $data['education_level'],
                 'profession' => $data['profession'],
-                'start_year' => $startYear,
+                'start_year' => $data['start_year'],
                 'referee_category_id' => $data['referee_category_id'],
                 'profile_photo_path' => $photoPath,
             ]);
@@ -207,23 +206,19 @@ new class extends Component {
 
     public function generateRefereeId(League $league): string
     {
-        // Verrouiller les lignes des arbitres de cette ligue
-        $lastReferee = Referee::where('league_id', '=', $league->id)
-            ->lockForUpdate()        // important : doit être dans DB::transaction
-            ->orderByDesc('id')
-            ->first();
+        // Le verrou sur la ligue sérialise aussi la création du tout premier arbitre.
+        League::whereKey($league->id)->lockForUpdate()->firstOrFail();
 
+        $lastNumber = Referee::where('league_id', $league->id)
+            ->whereNotNull('person_id')
+            ->pluck('person_id')
+            ->reduce(function (int $maximum, string $personId): int {
+                return preg_match('/-(\d+)$/', $personId, $matches)
+                    ? max($maximum, (int) $matches[1])
+                    : $maximum;
+            }, 0);
 
-        // Calcul du numéro séquentiel
-        $number = 1;
-
-        if ($lastReferee && $lastReferee->person_id) {
-            $parts = explode('-', $lastReferee->person_id);
-            // On prend la partie après le tiret, si elle existe
-            if (count($parts) > 1) {
-                $number = intval($parts[1]) + 1;
-            }
-        }
+        $number = $lastNumber + 1;
 
         // Formatage sur 6 chiffres
         $formattedNumber = str_pad($number, 6, '0', STR_PAD_LEFT);

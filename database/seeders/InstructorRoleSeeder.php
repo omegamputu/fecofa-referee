@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -27,7 +26,7 @@ class InstructorRoleSeeder extends Seeder
                 'slug' => Str::slug('physique'),
                 'description' => '',
                 'created_at' => now(),
-            ]
+            ],
         ];
 
         DB::table('instructor_roles')->insert($roles);

@@ -26,7 +26,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             //
-            $table->dropColumn(['invited_at','invitation_sent_count','last_login_at']);
+            $table->dropColumn(['invited_at', 'invitation_sent_count', 'last_login_at']);
         });
     }
 };

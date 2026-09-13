@@ -18,7 +18,7 @@ return new class extends Migration
                 ->constrained('leagues')
                 ->cascadeOnUpdate()
                 ->restrictOnDelete();
-            
+
             $table->foreignId('referee_category_id')
                 ->constrained('referee_categories')
                 ->cascadeOnUpdate()
@@ -49,7 +49,7 @@ return new class extends Migration
 
             // Arbitrage
             $table->year('start_year')->nullable();        // Année début arb.
-            
+
             // Critères d’acceptation (FIFA style)
             $table->boolean('has_medical_clearance')->default(false);
             $table->boolean('has_physical_clearance')->default(false);

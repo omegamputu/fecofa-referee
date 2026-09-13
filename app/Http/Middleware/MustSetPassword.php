@@ -12,12 +12,11 @@ class MustSetPassword
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check())
-        {
+        if (Auth::check()) {
             $user = Auth::user();
 
             // Exemption pour le SuperAdmin
@@ -26,13 +25,14 @@ class MustSetPassword
             }
 
             // Bloauer tous les utilisateurs sans mot de passe défini
-            if (is_null($user->password_set_at))
-            {
-                $user->logout();
+            if (is_null($user->password_set_at)) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
 
                 return redirect()->route('login')
                     ->withErrors([
-                        'email' => "Vous devez définir un mot de passe avant de continuer. Veuillez utiliser le lien de réinitialisation du mot de passe envoyé à votre adresse e-mail."
+                        'email' => 'Vous devez définir un mot de passe avant de continuer. Veuillez utiliser le lien de réinitialisation du mot de passe envoyé à votre adresse e-mail.',
                     ]);
             }
         }

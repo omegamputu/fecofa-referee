@@ -78,6 +78,8 @@ new class extends Component {
 
     public function toggleMedical(int $id): void
     {
+        $this->authorize('edit_referee');
+
         $referee = Referee::findOrFail($id);
         $referee->has_medical_clearance = !$referee->has_medical_clearance;
         $referee->save();
@@ -85,6 +87,8 @@ new class extends Component {
 
     public function togglePhysical(int $id): void
     {
+        $this->authorize('edit_referee');
+
         $referee = Referee::findOrFail($id);
         $referee->has_physical_clearance = !$referee->has_physical_clearance;
         $referee->save();

@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+
 return [
 
     /*
@@ -62,7 +64,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => env('AUTH_MODEL', User::class),
         ],
 
         // 'users' => [
@@ -100,8 +102,8 @@ return [
         // Broker spécial invitation
         'invites' => [
             'provider' => 'users',
-            'table'    => 'password_reset_tokens',
-            'expire'   => env('INVITE_TOKEN_EXPIRE', 30),     // ← ex: 30 minutes
+            'table' => 'password_reset_tokens',
+            'expire' => env('INVITE_TOKEN_EXPIRE', 30),     // ← ex: 30 minutes
             'throttle' => env('INVITE_TOKEN_THROTTLE', 30),
         ],
     ],
