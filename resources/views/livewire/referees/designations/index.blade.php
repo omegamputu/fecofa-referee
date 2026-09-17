@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Url;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
 
@@ -15,6 +16,7 @@ new class extends Component
 {
     use WithPagination;
 
+    #[Url]
     public string $search = '';
 
     public ?int $leagueFilter = null;
@@ -314,7 +316,14 @@ new class extends Component
                     <tr wire:key="referee-season-{{ $referee->id }}" class="hover:bg-neutral-50 dark:hover:bg-neutral-900/60">
                         <td class="px-4 py-3 font-mono text-xs">{{ $referee->person_id ?? '—' }}</td>
                         <td class="px-4 py-3 font-semibold text-neutral-900 dark:text-white">
-                            {{ $referee->fullName() }}
+                            @can('view_referee')
+                                <a href="{{ route('referees.show', $referee) }}" wire:navigate
+                                    class="hover:text-blue-600 hover:underline dark:hover:text-blue-400">
+                                    {{ $referee->fullName() }}
+                                </a>
+                            @else
+                                {{ $referee->fullName() }}
+                            @endcan
                         </td>
                         <td class="px-4 py-3">{{ $referee->league?->code ?? '—' }}</td>
                         <td class="px-4 py-3">{{ $referee->refereeCategory?->name ?? '—' }}</td>
