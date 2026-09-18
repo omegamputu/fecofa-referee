@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Referee\ExportController;
+use App\Http\Controllers\Referee\RefereeImportTemplateController;
 use App\Livewire\Auth\InviteSetPassword;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
@@ -79,6 +80,11 @@ Route::middleware(['auth', 'must_set_password'])->group(function () {
         ->name('referees.create')
         ->middleware(['permission:create_referee']);
 
+    Volt::route('/referees/{referee}', 'referees.show')
+        ->name('referees.show')
+        ->whereNumber('referee')
+        ->middleware(['permission:view_referee']);
+
     Volt::route('/referees/{referee}/edit', 'referees.edit')
         ->name('referees.edit')
         ->whereNumber('referee')
@@ -93,6 +99,10 @@ Route::get('/referees/export', [ExportController::class, 'refereeExportPdf'])
 Route::get('/referees/eligible/export', [ExportController::class, 'eligibleRefereesExportPdf'])
     ->name('referees.eligible.export')
     ->middleware(['auth', 'must_set_password', 'permission:export_referee_data']);
+
+Route::get('/referees/import/template', RefereeImportTemplateController::class)
+    ->name('referees.import.template')
+    ->middleware(['auth', 'must_set_password', 'permission:import_referee_data']);
 
 Route::get('/instructors/export', [ExportController::class, 'instructorExportPdf'])
     ->name('instructors.export')
