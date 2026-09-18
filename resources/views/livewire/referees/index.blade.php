@@ -1,24 +1,39 @@
 <?php
 
-use Livewire\Volt\Component;
-use Livewire\WithPagination;
+use App\Actions\ImportRefereesFromCsv;
 use App\Models\League;
 use App\Models\Referees\Referee;
-use App\Models\Referees\RefereeRole;
 use App\Models\Referees\RefereeCategory;
+use App\Models\Referees\RefereeRole;
+use Livewire\Volt\Component;
+use Livewire\WithFileUploads;
+use Livewire\WithPagination;
 
-new class extends Component {
-
-    use WithPagination;
+new class extends Component
+{
+    use WithFileUploads, WithPagination;
 
     public string $search = '';
+
     public ?int $leagueFilter = null;
+
     public ?int $categoryFilter = null;
+
     public ?int $roleFilter = null;
 
     public array $leagues = [];
+
     public array $categories = [];
+
     public array $roles = [];
+
+    public $csvFile = null;
+
+    public bool $showCsvImport = false;
+
+    public ?array $csvImportSummary = null;
+
+    public array $csvImportErrors = [];
 
     public function mount(): void
     {
@@ -42,6 +57,38 @@ new class extends Component {
         $this->resetPage();
     }
 
+    public function updatingCategoryFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function importCsv(ImportRefereesFromCsv $importer): void
+    {
+        $this->authorize('import_referee_data');
+
+        $this->csvImportSummary = null;
+        $this->csvImportErrors = [];
+
+        $this->validate([
+            'csvFile' => ['required', 'file', 'mimes:csv,txt', 'max:5120'],
+        ]);
+
+        $result = $importer->handle($this->csvFile);
+
+        $this->csvImportSummary = [
+            'imported' => $result['imported'],
+            'rejected' => $result['rejected'],
+        ];
+        $this->csvImportErrors = $result['errors'];
+        $this->reset('csvFile');
+        $this->resetPage();
+
+        session()->flash('status', __('CSV import completed: :imported imported, :rejected rejected.', [
+            'imported' => $result['imported'],
+            'rejected' => $result['rejected'],
+        ]));
+    }
+
     public function with(): array
     {
 
@@ -49,7 +96,7 @@ new class extends Component {
             ->with(['league', 'refereeCategory', 'refereeRole'])
             // 🔍 recherche texte
             ->when(filled($this->search), function ($q) {
-                $search = '%' . $this->search . '%';
+                $search = '%'.$this->search.'%';
 
                 $q->where(function ($sub) use ($search) {
                     $sub->where('last_name', 'like', $search)
@@ -81,7 +128,7 @@ new class extends Component {
         $this->authorize('edit_referee');
 
         $referee = Referee::findOrFail($id);
-        $referee->has_medical_clearance = !$referee->has_medical_clearance;
+        $referee->has_medical_clearance = ! $referee->has_medical_clearance;
         $referee->save();
     }
 
@@ -90,10 +137,9 @@ new class extends Component {
         $this->authorize('edit_referee');
 
         $referee = Referee::findOrFail($id);
-        $referee->has_physical_clearance = !$referee->has_physical_clearance;
+        $referee->has_physical_clearance = ! $referee->has_physical_clearance;
         $referee->save();
     }
-
 }
 
 ?>
@@ -134,14 +180,21 @@ new class extends Component {
             </flux:select>
         </div>
 
-        @can('create_referee')
-            <flux:button variant="primary" color="green" class="shrink-0 cursor-pointer" :href="route('referees.create')"
-                wire:navigate>
-                {{ __('Add referee') }}
-            </flux:button>
-        @endcan
+        <div class="flex shrink-0 flex-wrap items-center justify-end gap-2">
+            @can('import_referee_data')
+                <flux:button variant="outline" class="cursor-pointer" wire:click="$toggle('showCsvImport')">
+                    {{ __('Import CSV') }}
+                </flux:button>
+            @endcan
 
-        @can('export_referee_data')
+            @can('create_referee')
+                <flux:button variant="primary" color="green" class="cursor-pointer" :href="route('referees.create')"
+                    wire:navigate>
+                    {{ __('Add referee') }}
+                </flux:button>
+            @endcan
+
+            @can('export_referee_data')
                 <a href="{{ route('referees.export', [
                 'search' => $search ?? null,
                 'league' => $leagueFilter ?? null,
@@ -150,8 +203,70 @@ new class extends Component {
                     class="inline-flex items-center rounded-lg bg-white border px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
                     {{ __("Export PDF") }}
                 </a>
-        @endcan
+            @endcan
+        </div>
     </div>
+
+    @can('import_referee_data')
+        @if ($showCsvImport)
+            <section class="mb-6 rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-[#0E1526]">
+                <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                        <h2 class="text-lg font-semibold text-neutral-900 dark:text-white">{{ __('Import referees from CSV') }}</h2>
+                        <p class="mt-1 max-w-3xl text-sm text-neutral-500 dark:text-neutral-400">
+                            {{ __('Use the template and keep the required columns. Existing leagues, categories and functions must be used.') }}
+                        </p>
+                        <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                            {{ __('Required columns: nom, prenoms, sexe, code_ligue, categorie, fonction. Maximum :max referees and 5 MB.', ['max' => ImportRefereesFromCsv::MAX_ROWS]) }}
+                        </p>
+                    </div>
+
+                    <a href="{{ route('referees.import.template') }}"
+                        class="inline-flex shrink-0 items-center justify-center rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-800">
+                        {{ __('Download CSV template') }}
+                    </a>
+                </div>
+
+                <form wire:submit="importCsv" class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-end">
+                    <div class="w-full">
+                        <flux:input type="file" wire:model="csvFile" label="{{ __('CSV file') }}"
+                            accept=".csv,text/csv,text/plain" />
+                        @error('csvFile')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <flux:button type="submit" variant="primary" color="green" class="shrink-0 cursor-pointer"
+                        wire:loading.attr="disabled" wire:target="csvFile,importCsv">
+                        <span wire:loading.remove wire:target="csvFile,importCsv">{{ __('Import') }}</span>
+                        <span wire:loading wire:target="csvFile,importCsv">{{ __('Importing...') }}</span>
+                    </flux:button>
+                </form>
+
+                @if ($csvImportSummary)
+                    <div class="mt-5 rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm dark:border-neutral-700 dark:bg-neutral-900/40">
+                        <p class="font-medium text-neutral-900 dark:text-white">
+                            {{ __('CSV import completed: :imported imported, :rejected rejected.', $csvImportSummary) }}
+                        </p>
+
+                        @if ($csvImportErrors !== [])
+                            <ul class="mt-3 max-h-48 list-disc space-y-1 overflow-y-auto pl-5 text-red-700 dark:text-red-300">
+                                @foreach ($csvImportErrors as $importError)
+                                    <li>{{ $importError }}</li>
+                                @endforeach
+                            </ul>
+
+                            @if ($csvImportSummary['rejected'] > count($csvImportErrors))
+                                <p class="mt-2 text-xs text-neutral-500">
+                                    {{ __('Only the first :count errors are displayed.', ['count' => count($csvImportErrors)]) }}
+                                </p>
+                            @endif
+                        @endif
+                    </div>
+                @endif
+            </section>
+        @endif
+    @endcan
 
     <div class="bg-white dark:bg-[#0E1526] dark:border dark:border-neutral-600 rounded-xl">
         <table
@@ -234,18 +349,35 @@ new class extends Component {
 
                         {{-- Actions --}}
                         <td class="px-4 py-3 text-center">
-                            @can('edit_referee')
+                            <div class="flex flex-wrap items-center justify-center gap-1">
                                 <flux:button size="xs" variant="ghost"
                                     class="cursor-pointer dark:bg-[#0E1526] dark:text-white hover:dark:bg-[#0080C0]"
-                                    :href="route('referees.edit', $referee)" wire:navigate>
-                                    {{ __('Edit') }}
+                                    :href="route('referees.show', $referee)" wire:navigate>
+                                    {{ __('View profile') }}
                                 </flux:button>
-                            @endcan
+
+                                @can('edit_referee')
+                                    <flux:button size="xs" variant="ghost"
+                                        class="cursor-pointer dark:bg-[#0E1526] dark:text-white hover:dark:bg-[#0080C0]"
+                                        :href="route('referees.edit', $referee)" wire:navigate>
+                                        {{ __('Edit') }}
+                                    </flux:button>
+                                @endcan
+
+                                @can('manage_seasons')
+                                    <flux:button size="xs" variant="ghost"
+                                        class="cursor-pointer dark:bg-[#0E1526] dark:text-white hover:dark:bg-[#0080C0]"
+                                        :href="route('referees.designations.index', ['search' => $referee->person_id ?: $referee->fullName()])"
+                                        wire:navigate>
+                                        {{ __('Designate') }}
+                                    </flux:button>
+                                @endcan
+                            </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-4 py-6 text-center text-neutral-400">
+                        <td colspan="8" class="px-4 py-6 text-center text-neutral-400">
                             {{ __('No referees found.') }}
                         </td>
                     </tr>
