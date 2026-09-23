@@ -18,7 +18,7 @@ use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements CanResetPasswordContract, MustVerifyEmail
+class User extends Authenticatable implements CanResetPasswordContract
 {
     /** @use HasFactory<UserFactory> */
     use CanResetPassword, HasFactory, HasRoles, Notifiable, TwoFactorAuthenticatable;
