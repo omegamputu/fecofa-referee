@@ -279,7 +279,6 @@ new class extends Component
                     <th class="px-4 py-3">{{ __('Status') }}</th>
                     <th class="px-4 py-3 text-center">{{ __('Category') }}</th>
                     <th class="px-4 py-3">{{ __('Function') }}</th>
-                    <th class="px-4 py-3 text-center">{{ __('Phone number') }}</th>
                     <th class="px-4 py-3 text-center">{{ __('Actions') }}</th>
                 </tr>
             </thead>
@@ -340,11 +339,6 @@ new class extends Component
                         {{-- Fonction --}}
                         <td class="px-4 py-3">
                             {{ $referee->refereeRole?->name }}
-                        </td>
-
-                        {{-- Tests physiques --}}
-                        <td class="px-4 py-3 text-center">
-                            {{ $referee->phone ?? '-' }}
                         </td>
 
                         {{-- Actions --}}
