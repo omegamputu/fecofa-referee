@@ -106,10 +106,20 @@ class RoleAndPermissionSeeder extends Seeder
             'manage_matches',
             'manage_seasons',
             'manage_referee_categories', // accès aux catégories d'arbitres
-            'manage_referees',  // accès complet aux arbitres
-            'referee_access',  // accès aux écrans arbitres
-            'admin_access',
+            'manage_referees', // accès complet aux arbitres
+            'referee_access', // accès aux écrans arbitres
             'view_referee',
+            'create_referee',
+            'edit_referee',
+            'delete_referee',
+            'assign_match',
+            'edit_assignment',
+            'view_assignment',
+            'delete_assignment',
+            'record_evaluation',
+            'view_evaluation',
+            'manage_trainings',
+            'admin_access',
             'view_instructor',
             'create_instructor',
             'edit_instructor',
@@ -119,8 +129,9 @@ class RoleAndPermissionSeeder extends Seeder
 
         // --- MEMBER (Département arbitrage, CNA, etc.) ---
         $member->syncPermissions([
-            'manage_referees',      // clé pour tous les écrans arbitres
-            'manage_seasons',       // listes annuelles Ligue 1 et Ligue 2
+            'manage_referees', // clé pour tous les écrans arbitres
+            'referee_access',
+            'manage_seasons', // listes annuelles Ligue 1 et Ligue 2
             'view_referee',
             'create_referee',
             'edit_referee',
