@@ -1,16 +1,24 @@
-<?php 
+<?php
 
 use Livewire\Volt\Component;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
-new class extends Component {
-
+new class extends Component
+{
     public Role $role;
+
     public array $rolePermissions = [];
+
     public array $allPermissions = [];
+
     public string $newPermission = '';
+
     public string $createPermissionName = '';
+
+    public ?string $feedbackMessage = null;
+
+    public string $feedbackType = 'success';
 
     public function mount(Role $role)
     {
@@ -24,16 +32,18 @@ new class extends Component {
         $this->allPermissions = Permission::pluck('name')->toArray();
     }
 
-    public function createPermission()
+    public function createPermission(): void
     {
         $this->authorizePermissionManagement();
 
         $name = trim($this->createPermissionName);
 
-        if (!$name || Permission::where('name', $name)->exists()) {
-            session()->flash('error', __('Permission already exists or invalid name.'));
+        if (! $name || Permission::where('name', $name)->exists()) {
+            $this->showFeedback(__('Permission already exists or invalid name.'), 'error');
+
             return;
         }
+
         // Créer la permission
         $permission = Permission::create(['name' => $name]);
         // On met à jour la liste des permissions disponibles
@@ -41,14 +51,14 @@ new class extends Component {
 
         $this->createPermissionName = '';
 
-        session()->flash('status', __('Permission created successfully.'));
+        $this->showFeedback(__('Permission created successfully.'));
     }
 
-    public function addPermission()
+    public function addPermission(): void
     {
         $this->authorizePermissionManagement();
 
-        if (!$this->newPermission || in_array($this->newPermission, $this->rolePermissions)) {
+        if (! $this->newPermission || in_array($this->newPermission, $this->rolePermissions)) {
             return;
         }
 
@@ -56,17 +66,17 @@ new class extends Component {
         $this->rolePermissions[] = $this->newPermission;
         $this->newPermission = '';
 
-        session()->flash('status', __('Permission added.'));
+        $this->showFeedback(__('Permission added.'));
     }
 
-    public function removePermission($permission)
+    public function removePermission($permission): void
     {
         $this->authorizePermissionManagement();
 
         $this->role->revokePermissionTo($permission);
         $this->rolePermissions = array_values(array_diff($this->rolePermissions, [$permission]));
 
-        session()->flash('status', __('Permission removed.'));
+        $this->showFeedback(__('Permission removed.'));
     }
 
     public function updateRole()
@@ -88,6 +98,12 @@ new class extends Component {
             abort(403);
         }
     }
+
+    private function showFeedback(string $message, string $type = 'success'): void
+    {
+        $this->feedbackMessage = $message;
+        $this->feedbackType = $type;
+    }
 };
 ?>
 
@@ -98,6 +114,19 @@ new class extends Component {
             <h1 class="text-2xl font-semibold mb-6 dark:text-neutral-200">
                 {{ __('Edit Role') }} — <span class="text-indigo-500">{{ $role->name }}</span>
             </h1>
+
+            @if ($feedbackMessage)
+                <div
+                    role="{{ $feedbackType === 'error' ? 'alert' : 'status' }}"
+                    aria-live="polite"
+                    class="mb-4 rounded-lg border px-4 py-3 text-sm font-medium
+                        {{ $feedbackType === 'error'
+                            ? 'border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300'
+                            : 'border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950/40 dark:text-green-300' }}"
+                >
+                    {{ $feedbackMessage }}
+                </div>
+            @endif
 
             <x-auth-session-status :status="session('status')" class="mb-4" />
 
